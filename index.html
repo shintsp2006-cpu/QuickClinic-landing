@@ -51,7 +51,6 @@ nav.scrolled{background:rgba(5,11,26,.88);backdrop-filter:blur(14px);border-colo
 
 /* ── HERO ────────────────────────────────────── */
 #hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:7rem 2.5rem 4rem;overflow:hidden}
-#hero-canvas{position:absolute;top:0;right:0;width:62%;height:100%;pointer-events:none}
 #hero::after{content:'';position:absolute;top:50%;left:55%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(0,100,255,.07) 0%,transparent 70%);pointer-events:none}
 .hero-content{position:relative;z-index:2;max-width:590px}
 .eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:var(--glow2);border:1px solid var(--border);border-radius:100px;color:var(--blue);font-size:.72rem;font-weight:600;letter-spacing:.1em;padding:.3rem .9rem;margin-bottom:1.5rem;text-transform:uppercase}
@@ -68,7 +67,85 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .trust-bar{display:flex;flex-wrap:wrap;gap:1.25rem}
 .trust-item{color:var(--dim);font-size:.78rem;display:flex;align-items:center;gap:.4rem}
 .trust-item::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;box-shadow:0 0 5px var(--blue);flex-shrink:0}
-@media(max-width:860px){#hero-canvas{width:100%;opacity:.3}#hero{padding:6rem 1.5rem 3rem}}
+@media(max-width:860px){#hero{padding:6rem 1.5rem 3rem}}
+
+/* ── FLOW VIZ ────────────────────────────────── */
+#flow-viz{position:absolute;top:0;right:0;width:58%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
+.flow-panel{background:rgba(7,18,40,.78);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem 1.1rem 1rem;backdrop-filter:blur(10px);width:min(600px,95%);box-shadow:0 0 60px rgba(0,180,255,.06)}
+.flow-live{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+.flow-live-dot{width:7px;height:7px;background:var(--blue);border-radius:50%;box-shadow:0 0 6px var(--blue);animation:blink 2s ease infinite}
+.flow-live-lbl{color:var(--muted);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
+.flow-svg{width:100%;height:auto;overflow:visible}
+.fdash{stroke:#00b4ff;stroke-width:1.5;stroke-dasharray:7 4;fill:none;opacity:.55}
+@keyframes fda{to{stroke-dashoffset:-11}}
+.flow-stats{display:flex;gap:1.25rem;margin-top:.85rem;flex-wrap:wrap}
+.fstat{color:var(--dim);font-size:.72rem;display:flex;align-items:center;gap:.35rem}
+.fstat::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;opacity:.65}
+@media(max-width:860px){#flow-viz{position:relative;width:100%;height:auto;margin-top:2rem}}
+@media(max-width:580px){#flow-viz{display:none}}
+
+/* ── DEMO MODAL ──────────────────────────────── */
+#demo-modal{position:fixed;inset:0;z-index:700;background:rgba(2,7,16,.93);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s}
+#demo-modal.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:880px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 40px rgba(0,180,255,.07)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-hdr h3{font-family:var(--font-h);font-size:1rem;font-weight:700;color:var(--text)}
+.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.3rem;line-height:1;padding:.25rem .5rem;border-radius:6px;transition:color .15s,background .15s}
+.modal-close:hover{color:var(--text);background:var(--bg3)}
+.modal-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg3)}
+.modal-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-family:var(--font-b);font-size:.85rem;font-weight:500;padding:.8rem 1.5rem;transition:color .15s,border-color .15s;margin-bottom:-1px}
+.modal-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.modal-body{overflow-y:auto;flex:1}
+.modal-pane{display:none;padding:1.5rem}
+.modal-pane.active{display:block}
+.phys-wrap{display:grid;grid-template-columns:1fr 1.6fr;gap:1.25rem}
+@media(max-width:640px){.phys-wrap{grid-template-columns:1fr}}
+.pt-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.pt-name{font-family:var(--font-h);font-size:1.05rem;font-weight:700;margin-bottom:.2rem}
+.pt-meta{color:var(--muted);font-size:.8rem;margin-bottom:.9rem}
+.badge{display:inline-block;border-radius:5px;font-size:.7rem;font-weight:700;padding:.18rem .5rem;margin-right:.35rem}
+.esi2{background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.35);color:#ffb347}
+.high-rev{background:rgba(0,180,255,.12);border:1px solid rgba(0,180,255,.3);color:var(--blue)}
+.vital-row{display:flex;gap:.75rem;margin-top:.75rem;flex-wrap:wrap}
+.vital{text-align:center;background:var(--bg2);border-radius:8px;padding:.4rem .7rem}
+.vital-v{font-family:var(--font-h);font-size:1rem;font-weight:700;color:var(--text)}
+.vital-l{font-size:.65rem;color:var(--dim)}
+.soap-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.25rem;display:flex;flex-direction:column}
+.soap-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.soap-hdr h4{font-family:var(--font-h);font-size:.9rem;font-weight:700}
+.ai-tag{background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.25);border-radius:5px;color:var(--blue);font-size:.68rem;font-weight:600;padding:.2rem .5rem}
+.soap-section{margin-bottom:.85rem}
+.soap-label{font-size:.68rem;font-weight:700;color:var(--blue);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.25rem}
+.soap-text{font-size:.82rem;color:var(--text);line-height:1.55}
+.code-row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.4rem 0 1rem}
+.code-chip{background:var(--bg2);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:.72rem;padding:.2rem .55rem}
+.approve-btn{background:var(--blue);border:none;border-radius:8px;color:#000;cursor:pointer;font-family:var(--font-b);font-size:.88rem;font-weight:700;padding:.7rem 1.4rem;margin-top:auto;transition:box-shadow .2s,transform .15s;width:100%}
+.approve-btn:hover{box-shadow:0 0 20px var(--glow);transform:translateY(-1px)}
+.approve-btn.done{background:#00c97a;cursor:default;transform:none;box-shadow:none}
+.admin-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.25rem}
+@media(max-width:600px){.admin-metrics{grid-template-columns:repeat(2,1fr)}}
+.metric-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.metric-v{font-family:var(--font-h);font-size:1.6rem;font-weight:800;color:var(--blue);line-height:1}
+.metric-l{color:var(--muted);font-size:.75rem;margin-top:.3rem}
+.admin-bottom{display:grid;grid-template-columns:1.2fr 1fr;gap:1.25rem}
+@media(max-width:600px){.admin-bottom{grid-template-columns:1fr}}
+.queue-table{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.qt-hdr{padding:.65rem 1rem;border-bottom:1px solid var(--border);font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.qt-row{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid rgba(0,180,255,.06);font-size:.82rem}
+.qt-row:last-child{border-bottom:none}
+.qt-name{flex:1;font-weight:500}
+.qt-rev{color:var(--blue);font-size:.75rem;font-weight:600;white-space:nowrap}
+.chart-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.chart-hdr{font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.9rem}
+.bar-chart{display:flex;align-items:flex-end;gap:.4rem;height:90px}
+.bc-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.bc-bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--blue),var(--blue2));min-height:4px}
+.bc-day{font-size:.6rem;color:var(--dim)}
+.quinn-preview{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.1rem;max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:.65rem}
+.qp-msg{max-width:82%;font-size:.84rem;line-height:1.55;padding:.65rem .9rem;border-radius:10px}
+.qp-msg.bot{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:2px;align-self:flex-start}
+.qp-msg.usr{background:var(--blue);color:#000;align-self:flex-end;border-bottom-right-radius:2px}
+.qp-note{text-align:center;color:var(--dim);font-size:.75rem;margin-top:.5rem}
 
 /* ── SECTION SHARED ──────────────────────────── */
 section{position:relative;z-index:1;padding:6rem 2.5rem}
@@ -247,14 +324,101 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
 
 <!-- ── HERO ──────────────────────────────────── -->
 <section id="hero">
-  <canvas id="hero-canvas"></canvas>
+  <div id="flow-viz" aria-hidden="true">
+    <div class="flow-panel">
+      <div class="flow-live">
+        <div class="flow-live-dot"></div>
+        <span class="flow-live-lbl">Live AI Pipeline</span>
+      </div>
+      <svg class="flow-svg" viewBox="0 0 760 175" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="ng" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="7" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="dg" x="-150%" y="-150%" width="400%" height="400%">
+            <feGaussianBlur stdDeviation="5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <path id="tp" d="M75,82 L225,82 L375,82 L525,82 L675,82"/>
+        </defs>
+
+        <!-- Dashed connectors -->
+        <line x1="105" y1="82" x2="195" y2="82" class="fdash" style="animation:fda .8s linear infinite 0s"/>
+        <line x1="255" y1="82" x2="345" y2="82" class="fdash" style="animation:fda .8s linear infinite .2s"/>
+        <line x1="405" y1="82" x2="495" y2="82" class="fdash" style="animation:fda .8s linear infinite .4s"/>
+        <line x1="555" y1="82" x2="645" y2="82" class="fdash" style="animation:fda .8s linear infinite .6s"/>
+
+        <!-- Traveling dot (rendered before node fills so it hides underneath) -->
+        <circle r="6" fill="#00ccff" filter="url(#dg)">
+          <animateMotion dur="3.5s" repeatCount="indefinite" calcMode="linear">
+            <mpath href="#tp"/>
+          </animateMotion>
+        </circle>
+
+        <!-- Node 1: Patient Arrives -->
+        <circle cx="75" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin="0s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <circle cx="75" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="75" y="87" text-anchor="middle" font-family="Syne,sans-serif" font-size="15" font-weight="700" fill="#00ccff">P</text>
+        <text x="75" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Patient Arrives</text>
+
+        <!-- Node 2: AI Triage -->
+        <circle cx="225" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin=".6s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin=".6s"/>
+        </circle>
+        <circle cx="225" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="225" y="87" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#00ccff">AI</text>
+        <text x="225" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">AI Triage</text>
+
+        <!-- Node 3: SOAP Note Generated -->
+        <circle cx="375" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+        </circle>
+        <circle cx="375" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="375" y="87" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#00ccff">Rx</text>
+        <text x="375" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">SOAP Note</text>
+        <text x="375" y="142" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Generated</text>
+
+        <!-- Node 4: Physician Approves -->
+        <circle cx="525" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+        </circle>
+        <circle cx="525" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="525" y="88" text-anchor="middle" font-family="Syne,sans-serif" font-size="17" font-weight="700" fill="#00ccff">&#10003;</text>
+        <text x="525" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Physician</text>
+        <text x="525" y="142" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Approves</text>
+
+        <!-- Node 5: Revenue Captured -->
+        <circle cx="675" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin="2.4s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="2.4s"/>
+        </circle>
+        <circle cx="675" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="675" y="88" text-anchor="middle" font-family="Syne,sans-serif" font-size="17" font-weight="700" fill="#00ccff">$</text>
+        <text x="675" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Revenue</text>
+        <text x="675" y="142" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Captured</text>
+      </svg>
+      <div class="flow-stats">
+        <span class="fstat">ESI 1&ndash;5 Scoring</span>
+        <span class="fstat">FHIR R4</span>
+        <span class="fstat">Audit-First</span>
+        <span class="fstat">HIPAA-Eligible</span>
+      </div>
+    </div>
+  </div>
   <div class="hero-content">
     <div class="eyebrow"><span class="dot"></span>AWS Summit Demo &middot; Phase 5 Pilot Open</div>
     <h1>The AI Layer<br>Urgent Care Has<br><span class="grad">Been Waiting For.</span></h1>
     <p class="hero-sub">QuickClinic automates triage, clinical documentation, and billing — embedded inside Epic and athenaOne. No new app. No rip-and-replace.</p>
     <div class="cta-row">
       <a href="#pilot" class="btn-p">Request Pilot Access</a>
-      <a href="#hiw" class="btn-g">See How It Works ↓</a>
+      <button class="btn-g" id="demo-open-btn">See It in Action &#9654;</button>
     </div>
     <div class="trust-bar">
       <span class="trust-item">22 Healthcare Interviews Validated</span>
@@ -303,27 +467,27 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
     <div class="fi d2"><p class="s-sub">QuickClinic runs as a plugin inside the EMR systems physicians already use. Nothing new to learn — just fewer things to do manually.</p></div>
     <div class="feat-grid">
       <div class="feat-card fi d1">
-        <span class="feat-ico">⚡</span>
+        <span class="feat-ico">&#9889;</span>
         <div class="feat-title">Auto-Triage</div>
         <div class="feat-desc">Routes patients by acuity AND reimbursement potential simultaneously. The queue always reflects what's most valuable to see next.</div>
       </div>
       <div class="feat-card fi d2">
-        <span class="feat-ico">📋</span>
+        <span class="feat-ico">&#128203;</span>
         <div class="feat-title">AI Documentation</div>
         <div class="feat-desc">Generates a complete SOAP note draft from encounter data. Physicians review and approve in one click — not one hour.</div>
       </div>
       <div class="feat-card fi d3">
-        <span class="feat-ico">💰</span>
+        <span class="feat-ico">&#128176;</span>
         <div class="feat-title">Revenue Flagging</div>
         <div class="feat-desc">Surfaces every billing opportunity the documentation supports. No upcoding. No missed codes. Correct ICD-10 and CPT every time.</div>
       </div>
       <div class="feat-card fi d4">
-        <span class="feat-ico">🛡️</span>
+        <span class="feat-ico">&#128737;&#65039;</span>
         <div class="feat-title">Audit Trail</div>
         <div class="feat-desc">Immutable AI decision log before every EMR write. The compliance paper trail that makes hospital legal and IT teams say yes.</div>
       </div>
       <div class="feat-card fi d1">
-        <span class="feat-ico">🔌</span>
+        <span class="feat-ico">&#128268;</span>
         <div class="feat-title">EMR-Native</div>
         <div class="feat-desc">Runs inside Epic and athenaOne via FHIR R4. No standalone app. No training overhead. Drop-in deployment in days.</div>
       </div>
@@ -504,7 +668,7 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
           <input class="pilot-input" id="pilot-email" type="email" name="email" placeholder="your@clinic.com" required>
           <button class="pilot-btn" id="pilot-btn" type="submit">Request Access</button>
         </form>
-        <div class="pilot-ok" id="pilot-ok">✓ &nbsp;Got it — we'll be in touch before end of week.</div>
+        <div class="pilot-ok" id="pilot-ok">&#10003; &nbsp;Got it — we'll be in touch before end of week.</div>
         <div class="pilot-note fi d4">No commitment required. We handle HIPAA compliance, EMR integration, and onboarding from day one.</div>
       </div>
       <div class="qr-block fi d3">
@@ -585,7 +749,153 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<!-- ── DEMO MODAL ────────────────────────────── -->
+<div id="demo-modal" role="dialog" aria-modal="true" aria-label="Product Demo">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3>QuickClinic &mdash; Live Product Demo</h3>
+      <button class="modal-close" id="demo-close-btn" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="modal-tabs" role="tablist">
+      <button class="modal-tab active" data-tab="physician" role="tab">Physician View</button>
+      <button class="modal-tab" data-tab="admin" role="tab">Admin View</button>
+      <button class="modal-tab" data-tab="quinn" role="tab">Quinn AI</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Tab 1: Physician View -->
+      <div class="modal-pane active" id="pane-physician">
+        <div class="phys-wrap">
+          <div>
+            <div class="pt-card">
+              <div class="pt-name">Patient #7 &mdash; J.M.</div>
+              <div class="pt-meta">Male, 52 &middot; Arrived 09:14 AM</div>
+              <span class="badge esi2">ESI 2</span>
+              <span class="badge high-rev">High Revenue</span>
+              <div class="vital-row">
+                <div class="vital"><div class="vital-v">148/92</div><div class="vital-l">BP</div></div>
+                <div class="vital"><div class="vital-v">104</div><div class="vital-l">HR</div></div>
+                <div class="vital"><div class="vital-v">97%</div><div class="vital-l">SpO2</div></div>
+                <div class="vital"><div class="vital-v">37.1°</div><div class="vital-l">Temp</div></div>
+              </div>
+            </div>
+            <div style="margin-top:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1rem">
+              <div style="font-size:.72rem;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem">Triage Score</div>
+              <div style="font-family:var(--font-h);font-size:2rem;font-weight:800;color:var(--blue);line-height:1">ESI 2</div>
+              <div style="color:var(--muted);font-size:.78rem;margin-top:.25rem">Acuity: High &middot; Reimbursement: High</div>
+              <div style="margin-top:.75rem;background:var(--bg2);border-radius:6px;padding:.5rem .75rem;font-size:.78rem;color:var(--muted)">Chest pain with diaphoresis, elevated BP. Rule out ACS. Reimbursement tier: <span style="color:var(--blue);font-weight:600">high</span>.</div>
+            </div>
+          </div>
+          <div class="soap-card">
+            <div class="soap-hdr">
+              <h4>AI SOAP Note Draft</h4>
+              <span class="ai-tag">AI Generated &middot; Pending Approval</span>
+            </div>
+            <div class="soap-section">
+              <div class="soap-label">Subjective</div>
+              <div class="soap-text">52-year-old male presenting with acute onset chest pain, 7/10 severity, substernal with radiation to left arm. Associated diaphoresis and mild dyspnea. Onset approximately 45 minutes prior to arrival. Denies nausea or syncope. PMH: HTN, hyperlipidemia. Medications: lisinopril, atorvastatin.</div>
+            </div>
+            <div class="soap-section">
+              <div class="soap-label">Objective</div>
+              <div class="soap-text">BP 148/92, HR 104, RR 18, SpO2 97% RA, Temp 37.1°C. Diaphoretic. Cardiac: tachycardic, regular rhythm, no murmurs. Lungs: clear bilaterally. 12-lead ECG obtained — ST changes in V2-V4.</div>
+            </div>
+            <div class="soap-section">
+              <div class="soap-label">Assessment</div>
+              <div class="soap-text">Acute coronary syndrome, rule out STEMI/NSTEMI. High-risk features present. Immediate cardiology consultation warranted.</div>
+            </div>
+            <div class="soap-section">
+              <div class="soap-label">Plan</div>
+              <div class="soap-text">Aspirin 325mg PO, nitroglycerin SL PRN, IV access x2, troponin series, repeat ECG in 30 min, cardiology consult, admit to telemetry.</div>
+            </div>
+            <div class="soap-label">Billing Codes</div>
+            <div class="code-row">
+              <span class="code-chip">ICD-10: I20.0</span>
+              <span class="code-chip">ICD-10: I10</span>
+              <span class="code-chip">CPT: 99285</span>
+              <span class="code-chip">CPT: 93000</span>
+            </div>
+            <button class="approve-btn" id="approve-btn">&#10003;&nbsp; Approve &amp; File to EMR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Admin View -->
+      <div class="modal-pane" id="pane-admin">
+        <div class="admin-metrics">
+          <div class="metric-card">
+            <div class="metric-v">47</div>
+            <div class="metric-l">Patients Today</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-v">$18,420</div>
+            <div class="metric-l">Revenue Captured</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-v" style="color:#ffb347">8</div>
+            <div class="metric-l">Pending Notes</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-v">24 min</div>
+            <div class="metric-l">Avg. Wait Time</div>
+          </div>
+        </div>
+        <div class="admin-bottom">
+          <div class="queue-table">
+            <div class="qt-hdr">Priority Queue</div>
+            <div class="qt-row">
+              <span class="badge esi2">ESI 2</span>
+              <span class="qt-name">Patient #7 &mdash; Chest Pain</span>
+              <span class="qt-rev badge high-rev">High Rev</span>
+            </div>
+            <div class="qt-row">
+              <span class="badge" style="background:rgba(255,70,90,.15);border:1px solid rgba(255,70,90,.3);color:#ff6b6b">ESI 1</span>
+              <span class="qt-name">Patient #3 &mdash; Dyspnea</span>
+              <span class="qt-rev badge high-rev">High Rev</span>
+            </div>
+            <div class="qt-row">
+              <span class="badge" style="background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);color:#ffd93d">ESI 3</span>
+              <span class="qt-name">Patient #12 &mdash; Laceration</span>
+              <span class="qt-rev" style="color:var(--muted);font-size:.75rem">Med Rev</span>
+            </div>
+            <div class="qt-row">
+              <span class="badge" style="background:rgba(0,200,120,.1);border:1px solid rgba(0,200,120,.3);color:#00c97a">ESI 4</span>
+              <span class="qt-name">Patient #18 &mdash; URI</span>
+              <span class="qt-rev" style="color:var(--dim);font-size:.75rem">Low Rev</span>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-hdr">Revenue This Week ($K)</div>
+            <div class="bar-chart" id="admin-chart">
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:62%"></div><div class="bc-day">Mon</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:78%"></div><div class="bc-day">Tue</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:55%"></div><div class="bc-day">Wed</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:88%"></div><div class="bc-day">Thu</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:72%"></div><div class="bc-day">Fri</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:45%"></div><div class="bc-day">Sat</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:80%;background:linear-gradient(180deg,#00ccff,var(--blue))"></div><div class="bc-day" style="color:var(--blue)">Today</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Quinn AI -->
+      <div class="modal-pane" id="pane-quinn">
+        <div class="quinn-preview">
+          <div class="qp-msg bot">Hi! I'm Quinn, QuickClinic's AI assistant. Ask me anything about HIPAA compliance, how the pipeline works, or our pilot program.</div>
+          <div class="qp-msg usr">Is QuickClinic HIPAA compliant?</div>
+          <div class="qp-msg bot">Yes. Every AI decision is logged to an immutable audit trail before touching the EMR. No PHI is sent to the model — only a de-identified patient ID hash. Built on HIPAA-eligible AWS infrastructure (ECS Fargate, RDS with BAA, encrypted S3) from day one.</div>
+          <div class="qp-msg usr">How quickly can we see results?</div>
+          <div class="qp-msg bot">Most clinics see measurable documentation time reduction within week one. Revenue improvements from better billing code capture typically show up in the first billing cycle — usually 2–3 weeks post-integration. Our pilot includes full onboarding support from day one.</div>
+          <div class="qp-msg usr">How do I apply for the pilot?</div>
+          <div class="qp-msg bot">Use the "Request Pilot Access" form on this page, or email the team directly at shin.tsp2006@gmail.com. We're selecting one California urgent care clinic for a fully supported Phase 5 pilot — I'd love to connect you with the team today.</div>
+        </div>
+        <div class="qp-note">This is a preview of Quinn's FAQ capability. The live chatbot is embedded in the bottom-right corner of this page.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 'use strict';
 
@@ -618,10 +928,10 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
 /* ── MAIN INIT ─────────────────────────────────── */
 function initPage(){
   initNav();
-  initHero();
   initScrollAnimations();
   initQuinn();
   initPilotForm();
+  initDemoModal();
 }
 
 /* ── NAV ────────────────────────────────────────── */
@@ -632,102 +942,17 @@ function initNav(){
   onScroll();
 }
 
-/* ── THREE.JS HERO ─────────────────────────────── */
-function initHero(){
-  const canvas = document.getElementById('hero-canvas');
-  if(!canvas || typeof THREE === 'undefined') return;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
-  camera.position.z = 7;
-
-  // Inner wireframe icosahedron
-  const icoGeo = new THREE.IcosahedronGeometry(2, 3);
-  const icoMat = new THREE.MeshBasicMaterial({ color:0x0066cc, wireframe:true, transparent:true, opacity:0.28 });
-  const ico = new THREE.Mesh(icoGeo, icoMat);
-  scene.add(ico);
-
-  // Outer shell
-  const outerGeo = new THREE.IcosahedronGeometry(2.55, 2);
-  const outerMat = new THREE.MeshBasicMaterial({ color:0x00aaff, wireframe:true, transparent:true, opacity:0.07 });
-  const outer = new THREE.Mesh(outerGeo, outerMat);
-  scene.add(outer);
-
-  // Core glow (semi-transparent sphere)
-  const coreGeo = new THREE.SphereGeometry(1.7, 32, 32);
-  const coreMat = new THREE.MeshBasicMaterial({ color:0x003899, transparent:true, opacity:0.12 });
-  scene.add(new THREE.Mesh(coreGeo, coreMat));
-
-  // Equatorial rings
-  const ringAngles = [[0,0],[Math.PI/2.2,0.4],[Math.PI/3.5,-0.7]];
-  ringAngles.forEach(([rx,rz], i) => {
-    const rg = new THREE.TorusGeometry(2.25 + i*0.15, 0.006, 3, 90);
-    const rm = new THREE.MeshBasicMaterial({ color:0x00aaff, transparent:true, opacity:0.14 - i*0.025 });
-    const ring = new THREE.Mesh(rg, rm);
-    ring.rotation.x = rx; ring.rotation.z = rz;
-    scene.add(ring);
-  });
-
-  // Floating particles
-  const pCount = 350;
-  const pPos = new Float32Array(pCount * 3);
-  for(let i=0; i<pCount; i++){
-    const phi = Math.acos(-1 + (2*i)/pCount);
-    const theta = Math.sqrt(pCount * Math.PI) * phi;
-    const r = 3.0 + Math.random() * 1.8;
-    pPos[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-    pPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
-    pPos[i*3+2] = r * Math.cos(phi);
-  }
-  const ptGeo = new THREE.BufferGeometry();
-  ptGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-  const ptMat = new THREE.PointsMaterial({
-    color:0x00ccff, size:0.032, transparent:true, opacity:0.72,
-    sizeAttenuation:true, blending:THREE.AdditiveBlending
-  });
-  const pts = new THREE.Points(ptGeo, ptMat);
-  scene.add(pts);
-
-  function resize(){
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-  window.addEventListener('resize', resize, {passive:true});
-  resize();
-
-  let t = 0;
-  function animate(){
-    requestAnimationFrame(animate);
-    t += 0.004;
-    ico.rotation.y = t;
-    ico.rotation.x = t * 0.28;
-    outer.rotation.y = -t * 0.32;
-    outer.rotation.z = t * 0.14;
-    pts.rotation.y = t * 0.1;
-    pts.rotation.x = -t * 0.06;
-    renderer.render(scene, camera);
-  }
-  animate();
-}
-
 /* ── SCROLL ANIMATIONS ─────────────────────────── */
 function initScrollAnimations(){
-  // Fade-in observer
   const fadeObs = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('v'); fadeObs.unobserve(e.target); } });
   },{ threshold:0.12 });
   document.querySelectorAll('.fi').forEach(el=>fadeObs.observe(el));
 
-  // Counter observer
   const counterObs = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{
       if(e.isIntersecting){
         e.target.querySelectorAll('.counter').forEach(animateCounter);
-        // Animate market bars too
         e.target.querySelectorAll('.mbar-fill[data-width]').forEach(bar=>{
           const w = bar.dataset.width;
           setTimeout(()=>{ bar.style.width = w + '%'; }, 200);
@@ -755,6 +980,52 @@ function animateCounter(el){
     else el.textContent = prefix + (dec > 0 ? to.toFixed(dec) : to) + suffix;
   }
   requestAnimationFrame(step);
+}
+
+/* ── DEMO MODAL ─────────────────────────────────── */
+function initDemoModal(){
+  const modal = document.getElementById('demo-modal');
+  const openBtn = document.getElementById('demo-open-btn');
+  const closeBtn = document.getElementById('demo-close-btn');
+  const tabs = modal.querySelectorAll('.modal-tab');
+  const panes = modal.querySelectorAll('.modal-pane');
+  const approveBtn = document.getElementById('approve-btn');
+
+  function openModal(){
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
+
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      const target = tab.dataset.tab;
+      tabs.forEach(t=>t.classList.remove('active'));
+      panes.forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('pane-' + target).classList.add('active');
+    });
+  });
+
+  if(approveBtn){
+    approveBtn.addEventListener('click', ()=>{
+      if(approveBtn.classList.contains('done')) return;
+      approveBtn.textContent = 'Filing to EMR…';
+      approveBtn.disabled = true;
+      setTimeout(()=>{
+        approveBtn.classList.add('done');
+        approveBtn.textContent = '✓ Filed to EMR — Audit Log Written';
+      }, 1200);
+    });
+  }
 }
 
 /* ── QUINN ──────────────────────────────────────── */
@@ -811,7 +1082,6 @@ function initQuinn(){
     msgs.scrollTop = msgs.scrollHeight;
   }
 
-  // Greeting
   setTimeout(()=>{
     addMsg("Hi! I'm Quinn, QuickClinic's AI assistant. Ask me anything about the platform — how it works, pricing, HIPAA compliance, or the pilot program.", 'bot');
   }, 400);
@@ -827,7 +1097,6 @@ function initQuinn(){
     if(!v) return;
     addMsg(v, 'usr');
     input.value = '';
-    // Brief typing delay for realism
     setTimeout(()=>{ addMsg(matchFAQ(v), 'bot'); }, 520);
   }
 
