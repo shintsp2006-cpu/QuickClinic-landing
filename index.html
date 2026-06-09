@@ -300,6 +300,63 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
 /* ── MISC ────────────────────────────────────── */
 @media(max-width:580px){section{padding:4rem 1.25rem}.stat-grid{grid-template-columns:1fr 1fr}.feat-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.stat-grid{grid-template-columns:1fr}.stat-card{width:100%;padding:1rem}.stat-num{font-size:2rem}}
+
+/* ── MOBILE UX PASS (≤860px) ─────────────────── */
+@media(max-width:860px){
+  /* Section spacing */
+  section{padding:3rem 1.25rem}
+
+  /* Typography */
+  h1{font-size:26px;line-height:1.2}
+  h2{font-size:20px;line-height:1.25}
+  .hero-sub{font-size:.95rem}
+  .feat-desc,.step-desc,.why-desc,.mpath-note,.tf-item{font-size:.875rem}
+  .s-eye,.eyebrow,.stat-src,.flow-live-lbl,.fstat,.vital-l,.soap-label,.bc-day,.code-chip,.ai-tag,.qp-note,.footer-disc,.badge{font-size:.75rem}
+
+  /* Hero: text first, flow viz below */
+  .hero-content{order:0;width:100%}
+  #flow-viz{order:1;height:auto;justify-content:center}
+  .flow-panel{margin:0 auto}
+
+  /* Grids → single column */
+  .feat-grid{grid-template-columns:1fr}
+
+  /* Cards / panels */
+  .feat-card,.why-card,.team-card{padding:1rem}
+  .why-n{font-size:2rem}
+  .mbar-val{font-size:1.3rem}
+
+  /* Demo modal: full screen */
+  #demo-modal{padding:0}
+  .modal-box{width:100vw;height:100vh;max-height:100vh;max-width:100%;border-radius:0}
+  .modal-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .modal-tab{white-space:nowrap;flex-shrink:0}
+  .modal-pane{padding:1rem}
+  .phys-wrap{grid-template-columns:1fr}
+  .admin-metrics{grid-template-columns:repeat(2,1fr)}
+  .admin-bottom{grid-template-columns:1fr}
+
+  /* Quinn: full-width bottom sheet */
+  #qdrawer{left:0;right:0;bottom:0;width:100%;max-height:70vh;border-radius:18px 18px 0 0;transform:translateY(110%)}
+  #qdrawer.open{transform:translateY(0)}
+  #qbtn{right:1rem;bottom:1.5rem}
+
+  /* Touch targets */
+  .btn-p,.btn-g,.pilot-btn,.approve-btn,.gate-btn,.qsend,.modal-tab{min-height:44px}
+}
+
+/* ── MOBILE UX PASS (≤480px) ─────────────────── */
+@media(max-width:480px){
+  h1{font-size:24px}
+  h2{font-size:18px}
+  .feat-grid{grid-template-columns:1fr}
+  .cta-row{flex-direction:column}
+  .btn-p,.btn-g{width:100%;text-align:center;justify-content:center}
+  .pilot-form{flex-direction:column}
+  .pilot-input{min-width:0;width:100%}
+  .pilot-btn{width:100%}
+  .trust-bar{flex-direction:column;gap:.5rem}
+}
 </style>
 </head>
 <body>
