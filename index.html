@@ -67,7 +67,7 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .trust-bar{display:flex;flex-wrap:wrap;gap:1.25rem}
 .trust-item{color:var(--dim);font-size:.78rem;display:flex;align-items:center;gap:.4rem}
 .trust-item::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;box-shadow:0 0 5px var(--blue);flex-shrink:0}
-@media(max-width:860px){#hero{padding:58px 1.5rem 3rem;flex-direction:column;align-items:flex-start}#hero::after{display:none}}
+@media(max-width:860px){#hero{display:flex;flex-direction:column;align-items:flex-start;padding:58px 1.5rem 3rem}#hero::after{display:none}}
 
 /* ── FLOW VIZ ────────────────────────────────── */
 #flow-viz{position:absolute;top:0;right:0;width:58%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
@@ -84,7 +84,7 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .fstat{color:var(--dim);font-size:.72rem;display:flex;align-items:center;gap:.35rem}
 .fstat::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;opacity:.65}
 @media(max-width:860px){
-  #flow-viz{position:relative;width:100%;height:auto;margin-top:2rem}
+  #flow-viz{position:relative;top:auto;right:auto;width:100%;height:300px;margin-top:1.5rem}
   .flow-panel{width:100%;padding:.75rem}
   .flow-svg{display:none}
   .flow-svg-mobile{display:block}
