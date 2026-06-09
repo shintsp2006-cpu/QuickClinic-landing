@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden}
 :root{
   --bg:#050b1a;--bg2:#071228;--bg3:#0c1c3d;
   --blue:#00b4ff;--blue2:#0055d4;
@@ -18,7 +18,7 @@ html{scroll-behavior:smooth}
   --border:rgba(0,180,255,.13);--r:14px;
   --font-h:'Syne',sans-serif;--font-b:'Inter',sans-serif;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:16px;line-height:1.6;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:16px;line-height:1.6;overflow-x:hidden;width:100%}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(0,180,255,.055) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;z-index:0}
 
 /* ── GATE ────────────────────────────────────── */
@@ -67,7 +67,7 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .trust-bar{display:flex;flex-wrap:wrap;gap:1.25rem}
 .trust-item{color:var(--dim);font-size:.78rem;display:flex;align-items:center;gap:.4rem}
 .trust-item::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;box-shadow:0 0 5px var(--blue);flex-shrink:0}
-@media(max-width:860px){#hero{padding:6rem 1.5rem 3rem}}
+@media(max-width:860px){#hero{padding:6rem 1.5rem 3rem;flex-direction:column;align-items:flex-start}#hero::after{display:none}}
 
 /* ── FLOW VIZ ────────────────────────────────── */
 #flow-viz{position:absolute;top:0;right:0;width:58%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
@@ -76,13 +76,13 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .flow-live-dot{width:7px;height:7px;background:var(--blue);border-radius:50%;box-shadow:0 0 6px var(--blue);animation:blink 2s ease infinite}
 .flow-live-lbl{color:var(--muted);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
 .flow-svg{width:100%;height:auto;overflow:visible}
-.fdash{stroke:#00b4ff;stroke-width:1.5;stroke-dasharray:7 4;fill:none;opacity:.55}
+.fdash{stroke:#00b4ff;stroke-width:1.5;stroke-dasharray:7 4;fill:none;opacity:.55;animation-play-state:paused}
+.site-ready .fdash{animation-play-state:running}
 @keyframes fda{to{stroke-dashoffset:-11}}
 .flow-stats{display:flex;gap:1.25rem;margin-top:.85rem;flex-wrap:wrap}
 .fstat{color:var(--dim);font-size:.72rem;display:flex;align-items:center;gap:.35rem}
 .fstat::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;opacity:.65}
-@media(max-width:860px){#flow-viz{position:relative;width:100%;height:auto;margin-top:2rem}}
-@media(max-width:580px){#flow-viz{display:none}}
+@media(max-width:860px){#flow-viz{display:none}}
 
 /* ── DEMO MODAL ──────────────────────────────── */
 #demo-modal{position:fixed;inset:0;z-index:700;background:rgba(2,7,16,.93);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -149,7 +149,7 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 
 /* ── SECTION SHARED ──────────────────────────── */
 section{position:relative;z-index:1;padding:6rem 2.5rem}
-.si{max-width:1080px;margin:0 auto}
+.si{max-width:1080px;margin:0 auto;width:100%}
 .s-eye{color:var(--blue);font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.6rem}
 h2{font-family:var(--font-h);font-size:clamp(1.85rem,3.5vw,2.75rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;margin-bottom:.9rem}
 .s-sub{color:var(--muted);font-size:1rem;max-width:540px;line-height:1.75;margin-bottom:3rem}
@@ -899,6 +899,11 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
 <script>
 'use strict';
 
+/* Pause SVG SMIL animations immediately — before gate closes */
+document.querySelectorAll('#flow-viz svg').forEach(svg => {
+  try { svg.pauseAnimations(); } catch(e) {}
+});
+
 /* ── GATE ──────────────────────────────────────── */
 (function(){
   const gate = document.getElementById('gate');
@@ -910,7 +915,17 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
   function tryUnlock(){
     if(input.value.trim().toUpperCase() === CODE){
       gate.classList.add('hide');
-      setTimeout(()=>{ gate.style.display='none'; initPage(); }, 500);
+      setTimeout(()=>{
+        gate.style.display = 'none';
+        /* 300ms after gate is fully gone, start animations and page init */
+        setTimeout(() => {
+          document.body.classList.add('site-ready');
+          document.querySelectorAll('#flow-viz svg').forEach(svg => {
+            try { svg.unpauseAnimations(); } catch(e) {}
+          });
+          initPage();
+        }, 300);
+      }, 500);
     } else {
       err.textContent = 'Incorrect access code.';
       input.value = '';
@@ -928,10 +943,11 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
 /* ── MAIN INIT ─────────────────────────────────── */
 function initPage(){
   initNav();
-  initScrollAnimations();
   initQuinn();
   initPilotForm();
   initDemoModal();
+  /* Delay scroll animations so .fi elements don't jump during gate fade */
+  setTimeout(initScrollAnimations, 300);
 }
 
 /* ── NAV ────────────────────────────────────────── */
