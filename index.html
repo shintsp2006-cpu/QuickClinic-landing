@@ -76,13 +76,19 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .flow-live-dot{width:7px;height:7px;background:var(--blue);border-radius:50%;box-shadow:0 0 6px var(--blue);animation:blink 2s ease infinite}
 .flow-live-lbl{color:var(--muted);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
 .flow-svg{width:100%;height:auto;overflow:visible}
+.flow-svg-mobile{display:none;width:100%;height:auto;overflow:hidden}
 .fdash{stroke:#00b4ff;stroke-width:1.5;stroke-dasharray:7 4;fill:none;opacity:.55;animation-play-state:paused}
 .site-ready .fdash{animation-play-state:running}
 @keyframes fda{to{stroke-dashoffset:-11}}
 .flow-stats{display:flex;gap:1.25rem;margin-top:.85rem;flex-wrap:wrap}
 .fstat{color:var(--dim);font-size:.72rem;display:flex;align-items:center;gap:.35rem}
 .fstat::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;opacity:.65}
-@media(max-width:860px){#flow-viz{display:none}}
+@media(max-width:860px){
+  #flow-viz{position:relative;width:100%;height:auto;margin-top:2rem}
+  .flow-panel{width:100%;padding:.75rem}
+  .flow-svg{display:none}
+  .flow-svg-mobile{display:block}
+}
 
 /* ── DEMO MODAL ──────────────────────────────── */
 #demo-modal{position:fixed;inset:0;z-index:700;background:rgba(2,7,16,.93);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -404,6 +410,85 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
         <text x="675" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Revenue</text>
         <text x="675" y="142" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Captured</text>
       </svg>
+
+      <!-- Mobile compact SVG (viewBox 350×150, shown at ≤860px) -->
+      <svg class="flow-svg-mobile" viewBox="0 0 350 150" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="ng-m" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="dg-m" x="-150%" y="-150%" width="400%" height="400%">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <path id="tp-m" d="M35,58 L105,58 L175,58 L245,58 L315,58"/>
+        </defs>
+
+        <!-- Dashed connectors -->
+        <line x1="58" y1="58" x2="82" y2="58" class="fdash" style="animation:fda .8s linear infinite 0s"/>
+        <line x1="128" y1="58" x2="152" y2="58" class="fdash" style="animation:fda .8s linear infinite .2s"/>
+        <line x1="198" y1="58" x2="222" y2="58" class="fdash" style="animation:fda .8s linear infinite .4s"/>
+        <line x1="268" y1="58" x2="292" y2="58" class="fdash" style="animation:fda .8s linear infinite .6s"/>
+
+        <!-- Traveling dot (rendered before node fills so it hides underneath) -->
+        <circle r="5" fill="#00ccff" filter="url(#dg-m)">
+          <animateMotion dur="3.5s" repeatCount="indefinite" calcMode="linear">
+            <mpath href="#tp-m"/>
+          </animateMotion>
+        </circle>
+
+        <!-- Node 1: Patient Arrives -->
+        <circle cx="35" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin="0s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <circle cx="35" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="35" y="63" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#00ccff">P</text>
+        <text x="35" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Patient</text>
+        <text x="35" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Arrives</text>
+
+        <!-- Node 2: AI Triage -->
+        <circle cx="105" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin=".6s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin=".6s"/>
+        </circle>
+        <circle cx="105" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="105" y="63" text-anchor="middle" font-family="Syne,sans-serif" font-size="10" font-weight="700" fill="#00ccff">AI</text>
+        <text x="105" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">AI</text>
+        <text x="105" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Triage</text>
+
+        <!-- Node 3: SOAP Note -->
+        <circle cx="175" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+        </circle>
+        <circle cx="175" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="175" y="63" text-anchor="middle" font-family="Syne,sans-serif" font-size="10" font-weight="700" fill="#00ccff">Rx</text>
+        <text x="175" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">SOAP</text>
+        <text x="175" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Note</text>
+
+        <!-- Node 4: Physician Approves -->
+        <circle cx="245" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+        </circle>
+        <circle cx="245" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="245" y="64" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" font-weight="700" fill="#00ccff">&#10003;</text>
+        <text x="245" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">MD</text>
+        <text x="245" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Approves</text>
+
+        <!-- Node 5: Revenue Captured -->
+        <circle cx="315" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin="2.4s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="2.4s"/>
+        </circle>
+        <circle cx="315" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="315" y="64" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" font-weight="700" fill="#00ccff">$</text>
+        <text x="315" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Revenue</text>
+        <text x="315" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Captured</text>
+      </svg>
+
       <div class="flow-stats">
         <span class="fstat">ESI 1&ndash;5 Scoring</span>
         <span class="fstat">FHIR R4</span>
