@@ -68,7 +68,7 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .trust-bar{display:flex;flex-wrap:wrap;gap:1.25rem}
 .trust-item{color:var(--dim);font-size:.78rem;display:flex;align-items:center;gap:.4rem}
 .trust-item::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;box-shadow:0 0 5px var(--blue);flex-shrink:0}
-@media(max-width:860px){#hero{box-sizing:border-box;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:66px 1.5rem 1rem;height:auto;min-height:0}#hero::after{display:none}}
+@media(max-width:860px){#hero{box-sizing:border-box;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start!important;padding:66px 1.5rem 1rem!important;height:auto!important;min-height:0!important}#hero::after{display:none}}
 
 /* ── FLOW VIZ ────────────────────────────────── */
 #flow-viz{position:absolute;top:0;right:0;width:58%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
@@ -366,6 +366,71 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
   .pilot-btn{width:100%}
   .trust-bar{flex-direction:column;gap:.5rem}
 }
+
+/* ── INTERACTIVE DEMO ────────────────────────── */
+#demo-section{background:linear-gradient(180deg,transparent,var(--bg2) 20%,var(--bg2) 80%,transparent)}
+.demo-window{background:var(--bg2);border:1px solid rgba(0,180,255,.22);border-radius:18px;overflow:hidden;box-shadow:0 0 80px rgba(0,180,255,.07),0 32px 80px rgba(0,0,0,.55);max-width:880px;margin:0 auto}
+.demo-titlebar{background:#06111f;border-bottom:1px solid var(--border);padding:.7rem 1.2rem;display:flex;align-items:center;gap:.8rem;flex-shrink:0}
+.demo-dots{display:flex;gap:.42rem}
+.demo-dot{width:12px;height:12px;border-radius:50%}
+.demo-dot:nth-child(1){background:#ff5f57}
+.demo-dot:nth-child(2){background:#febc2e}
+.demo-dot:nth-child(3){background:#28c840}
+.demo-win-title{flex:1;text-align:center;font-size:.75rem;color:var(--muted);font-family:var(--font-b);letter-spacing:.02em}
+.demo-live-badge{display:flex;align-items:center;gap:.35rem;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.28);border-radius:100px;padding:.18rem .6rem;font-size:.65rem;font-weight:700;color:#00c97a;letter-spacing:.06em;white-space:nowrap;flex-shrink:0}
+.demo-live-dot{width:6px;height:6px;background:#00c97a;border-radius:50%;box-shadow:0 0 5px #00c97a;animation:blink 1.5s ease infinite}
+.demo-tabs-bar{display:flex;border-bottom:1px solid var(--border);background:#06111f}
+.demo-tab-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-family:var(--font-b);font-size:.85rem;font-weight:500;padding:.75rem 1.4rem;transition:color .15s,border-color .15s;margin-bottom:-1px;white-space:nowrap}
+.demo-tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.demo-body{background:var(--bg2);overflow:hidden}
+.demo-pane{display:none;padding:1.2rem;position:relative;min-height:360px}
+.demo-pane.active{display:block}
+.dp-layout{display:grid;grid-template-columns:1fr 1.6fr;gap:1rem}
+@media(max-width:680px){.dp-layout{grid-template-columns:1fr}}
+.dp-patient{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1rem}
+.dp-pt-name{font-family:var(--font-h);font-size:.95rem;font-weight:700;margin-bottom:.15rem}
+.dp-pt-meta{color:var(--muted);font-size:.74rem;margin-bottom:.65rem}
+.dp-vitals{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.7rem}
+.dp-vital{background:var(--bg2);border-radius:6px;padding:.28rem .52rem;text-align:center}
+.dp-vital-v{font-family:var(--font-h);font-size:.86rem;font-weight:700}
+.dp-vital-l{font-size:.57rem;color:var(--dim)}
+.dp-badges{display:flex;gap:.35rem;margin-bottom:.75rem;flex-wrap:wrap}
+.dp-gen-btn{background:var(--blue);border:none;border-radius:8px;color:#000;cursor:default;font-family:var(--font-b);font-size:.79rem;font-weight:600;padding:.5rem .9rem;width:100%;text-align:center;transition:box-shadow .2s,filter .2s}
+.dp-gen-btn.pulse{box-shadow:0 0 22px var(--glow);filter:brightness(1.15)}
+.dp-soap{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1rem;opacity:0;transform:translateY(10px);transition:opacity .4s ease,transform .4s ease}
+.dp-soap.show{opacity:1;transform:none}
+.dp-soap-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.dp-soap-hdr h4{font-family:var(--font-h);font-size:.84rem;font-weight:700}
+.dp-soap-s{margin-bottom:.6rem}
+.dp-soap-lbl{font-size:.61rem;font-weight:700;color:var(--blue);letter-spacing:.13em;text-transform:uppercase;margin-bottom:.16rem}
+.dp-soap-txt{font-size:.75rem;color:var(--text);line-height:1.5}
+.dp-approve-btn{background:rgba(0,180,255,.07);border:1.5px solid rgba(0,180,255,.28);border-radius:8px;color:var(--blue);cursor:default;font-family:var(--font-b);font-size:.79rem;font-weight:600;padding:.5rem .9rem;width:100%;margin-top:.65rem;text-align:center;transition:background .18s,color .18s,box-shadow .18s}
+.dp-approve-btn.pulse{background:var(--blue);color:#000;box-shadow:0 0 22px var(--glow)}
+.dp-filed{display:flex;align-items:center;gap:.4rem;color:#00c97a;font-size:.78rem;font-weight:600;margin-top:.6rem;opacity:0;transition:opacity .3s}
+.dp-filed.show{opacity:1}
+.dp-cursor{position:absolute;pointer-events:none;z-index:20;opacity:0;transition:left .65s cubic-bezier(.4,0,.2,1),top .65s cubic-bezier(.4,0,.2,1),opacity .2s;left:50%;top:50%}
+.dp-cursor svg{width:18px;height:22px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.8))}
+.dp-cursor.show{opacity:1}
+.dp-cursor.press{transform:scale(.82);transition:left .65s cubic-bezier(.4,0,.2,1),top .65s cubic-bezier(.4,0,.2,1),opacity .2s,transform .08s}
+.da-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1rem}
+@media(max-width:600px){.da-metrics{grid-template-columns:repeat(2,1fr)}}
+.da-metric{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.75rem}
+.da-metric-v{font-family:var(--font-h);font-size:1.35rem;font-weight:800;color:var(--blue);line-height:1;margin-bottom:.18rem}
+.da-metric-l{color:var(--muted);font-size:.67rem}
+.da-queue{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1rem}
+.da-q-hdr{padding:.48rem .85rem;border-bottom:1px solid var(--border);font-size:.66rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.da-q-row{display:flex;align-items:center;gap:.5rem;padding:.52rem .85rem;border-bottom:1px solid rgba(0,180,255,.06);font-size:.77rem;opacity:0;transform:translateX(-6px);transition:opacity .3s ease,transform .3s ease}
+.da-q-row:last-child{border-bottom:none}
+.da-q-row.show{opacity:1;transform:none}
+.da-q-name{font-weight:600;width:28px;flex-shrink:0}
+.da-q-cc{flex:1;color:var(--muted);font-size:.74rem}
+.da-q-rev{color:var(--blue);font-size:.72rem;font-weight:600;white-space:nowrap}
+.da-chart{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.85rem}
+.da-chart-lbl{font-size:.7rem;font-weight:600;color:var(--muted);margin-bottom:.65rem}
+.da-bars{display:flex;align-items:flex-end;gap:.28rem;height:65px}
+.da-bar-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem}
+.da-bar{width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--blue),var(--blue2));height:0;transition:height .85s cubic-bezier(.22,1,.36,1)}
+.da-bar-day{font-size:.55rem;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -576,6 +641,96 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
       <span class="trust-item">22 Healthcare Interviews Validated</span>
       <span class="trust-item">HIPAA-Eligible Infrastructure</span>
       <span class="trust-item">Epic &amp; athenaOne FHIR R4</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── INTERACTIVE DEMO ──────────────────────── -->
+<section id="demo-section">
+  <div class="si">
+    <div class="fi"><div class="s-eye">See It Live</div></div>
+    <div class="fi d1"><h2>Watch it work.</h2></div>
+    <div class="fi d2"><p class="s-sub">From patient arrival to filed note in under 90 seconds &mdash; no extra clicks, no new tab.</p></div>
+    <div class="demo-window fi d3">
+      <div class="demo-titlebar">
+        <div class="demo-dots"><span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span></div>
+        <span class="demo-win-title">QuickClinic &mdash; Live Demo</span>
+        <div class="demo-live-badge"><span class="demo-live-dot"></span>LIVE</div>
+      </div>
+      <div class="demo-tabs-bar">
+        <button class="demo-tab-btn active" data-demo="phys">Physician View</button>
+        <button class="demo-tab-btn" data-demo="admin">Admin View</button>
+      </div>
+      <div class="demo-body">
+
+        <!-- PHYSICIAN PANE -->
+        <div class="demo-pane active" id="dp-phys">
+          <div class="dp-cursor" id="demo-cur"><svg viewBox="0 0 18 22" fill="none"><path d="M0 0v16l4.5-4L7 18.5l2-1L6.5 11H11z" fill="white" stroke="rgba(0,0,0,.3)" stroke-width=".7"/></svg></div>
+          <div class="dp-layout">
+            <div>
+              <div class="dp-patient">
+                <div class="dp-pt-name">J.M. &mdash; 38F</div>
+                <div class="dp-pt-meta">Chest pain &middot; onset 2 hours</div>
+                <div class="dp-vitals">
+                  <div class="dp-vital"><div class="dp-vital-v">142/88</div><div class="dp-vital-l">BP</div></div>
+                  <div class="dp-vital"><div class="dp-vital-v">96</div><div class="dp-vital-l">HR</div></div>
+                  <div class="dp-vital"><div class="dp-vital-v">98%</div><div class="dp-vital-l">SpO2</div></div>
+                  <div class="dp-vital"><div class="dp-vital-v">98.6</div><div class="dp-vital-l">Temp</div></div>
+                </div>
+                <div class="dp-badges">
+                  <span class="badge esi2">ESI 2</span>
+                  <span class="badge high-rev">High Revenue</span>
+                </div>
+                <button class="dp-gen-btn" id="dg-btn">Generate Note &rarr;</button>
+              </div>
+            </div>
+            <div>
+              <div class="dp-soap" id="dg-soap">
+                <div class="dp-soap-hdr">
+                  <h4>SOAP Note Draft</h4>
+                  <span class="ai-tag">AI Generated</span>
+                </div>
+                <div class="dp-soap-s"><div class="dp-soap-lbl">Subjective</div><div class="dp-soap-txt">38F with acute chest pain 8/10, onset 2h, radiating to left arm. Diaphoresis noted.</div></div>
+                <div class="dp-soap-s"><div class="dp-soap-lbl">Objective</div><div class="dp-soap-txt">BP 142/88, HR 96, SpO2 98%. EKG: ST changes V2&ndash;V4. Troponin pending.</div></div>
+                <div class="dp-soap-s"><div class="dp-soap-lbl">Assessment</div><div class="dp-soap-txt">R/O ACS, probable NSTEMI. ICD-10: I21.4, R07.9. CPT: 99285, 93000.</div></div>
+                <div class="dp-soap-s"><div class="dp-soap-lbl">Plan</div><div class="dp-soap-txt">ASA 325 mg, IV access, serial troponins q3h, cardiology consult, admit for observation.</div></div>
+                <button class="dp-approve-btn" id="da-btn">Approve &amp; File to EMR &rarr;</button>
+                <div class="dp-filed" id="df-msg">&#10003;&nbsp; Note filed to Epic EMR</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN PANE -->
+        <div class="demo-pane" id="dp-admin">
+          <div class="da-metrics">
+            <div class="da-metric"><div class="da-metric-v" id="dm-pts">0</div><div class="da-metric-l">Patients Today</div></div>
+            <div class="da-metric"><div class="da-metric-v" id="dm-rev">$0</div><div class="da-metric-l">Revenue Captured</div></div>
+            <div class="da-metric"><div class="da-metric-v" id="dm-notes">0</div><div class="da-metric-l">Pending Notes</div></div>
+            <div class="da-metric"><div class="da-metric-v" id="dm-wait">0m</div><div class="da-metric-l">Avg Wait Time</div></div>
+          </div>
+          <div class="da-queue">
+            <div class="da-q-hdr">Priority Queue</div>
+            <div class="da-q-row" id="dq-0"><span class="da-q-name">J.M.</span><span class="da-q-cc">Chest Pain</span><span class="badge esi2" style="flex-shrink:0">ESI 2</span><span class="da-q-rev">$420</span></div>
+            <div class="da-q-row" id="dq-1"><span class="da-q-name">T.K.</span><span class="da-q-cc">Laceration</span><span class="badge" style="background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.3);color:#ffd060;flex-shrink:0">ESI 3</span><span class="da-q-rev">$180</span></div>
+            <div class="da-q-row" id="dq-2"><span class="da-q-name">R.S.</span><span class="da-q-cc">Upper Resp.</span><span class="badge" style="background:rgba(94,136,176,.1);border:1px solid rgba(94,136,176,.25);color:var(--muted);flex-shrink:0">ESI 4</span><span class="da-q-rev" style="color:var(--muted)">$95</span></div>
+            <div class="da-q-row" id="dq-3"><span class="da-q-name">M.C.</span><span class="da-q-cc">Ankle Sprain</span><span class="badge" style="background:rgba(94,136,176,.1);border:1px solid rgba(94,136,176,.25);color:var(--muted);flex-shrink:0">ESI 4</span><span class="da-q-rev" style="color:var(--muted)">$140</span></div>
+          </div>
+          <div class="da-chart">
+            <div class="da-chart-lbl">Revenue &mdash; Last 7 Days</div>
+            <div class="da-bars">
+              <div class="da-bar-w"><div class="da-bar" data-pct="67"></div><div class="da-bar-day">Mon</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="81"></div><div class="da-bar-day">Tue</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="55"></div><div class="da-bar-day">Wed</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="88"></div><div class="da-bar-day">Thu</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="72"></div><div class="da-bar-day">Fri</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="49"></div><div class="da-bar-day">Sat</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="95"></div><div class="da-bar-day">Sun</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </section>
@@ -1063,6 +1218,7 @@ function initPage(){
   initQuinn();
   initPilotForm();
   initDemoModal();
+  initInteractiveDemo();
   initScrollAnimations();
 }
 
@@ -1269,6 +1425,107 @@ function initPilotForm(){
       btnEl.disabled = false;
     }
   });
+}
+
+/* ── INTERACTIVE DEMO ─────────────────────────── */
+var _demoTimers=[];
+var _demoGen=0;
+function _ddt(fn,ms){var id=setTimeout(fn,ms);_demoTimers.push(id);}
+function _stopDemo(){_demoTimers.forEach(clearTimeout);_demoTimers=[];_demoGen++;}
+
+function initInteractiveDemo(){
+  var tabBtns=document.querySelectorAll('.demo-tab-btn');
+  if(!tabBtns.length) return;
+  tabBtns.forEach(function(btn){
+    btn.addEventListener('click',function(){
+      tabBtns.forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      document.querySelectorAll('.demo-pane').forEach(function(p){p.classList.remove('active');});
+      var pane=document.getElementById('dp-'+btn.dataset.demo);
+      if(pane) pane.classList.add('active');
+      _stopDemo();
+      if(btn.dataset.demo==='phys') _physLoop();
+      else _adminLoop();
+    });
+  });
+  _physLoop();
+}
+
+function _resetPhys(){
+  var g=document.getElementById('dg-btn'),s=document.getElementById('dg-soap'),
+      a=document.getElementById('da-btn'),f=document.getElementById('df-msg'),
+      c=document.getElementById('demo-cur');
+  if(g) g.classList.remove('pulse');
+  if(s) s.classList.remove('show');
+  if(a) a.classList.remove('pulse');
+  if(f) f.classList.remove('show');
+  if(c){c.classList.remove('show','press');c.style.left='50%';c.style.top='50%';}
+}
+
+function _physLoop(){
+  var pane=document.getElementById('dp-phys');
+  if(!pane||!pane.classList.contains('active')) return;
+  _resetPhys();
+  var genBtn=document.getElementById('dg-btn'),soap=document.getElementById('dg-soap'),
+      appBtn=document.getElementById('da-btn'),filed=document.getElementById('df-msg'),
+      cur=document.getElementById('demo-cur');
+  if(!cur||!genBtn) return;
+
+  function pos(el){
+    var pr=pane.getBoundingClientRect(),er=el.getBoundingClientRect();
+    cur.style.left=(er.left-pr.left+er.width*.3)+'px';
+    cur.style.top=(er.top-pr.top+er.height*.3)+'px';
+  }
+
+  _ddt(function(){cur.classList.add('show');pos(genBtn);},700);
+  _ddt(function(){cur.classList.add('press');genBtn.classList.add('pulse');},1750);
+  _ddt(function(){cur.classList.remove('press');soap.classList.add('show');},2100);
+  _ddt(function(){pos(appBtn);},4200);
+  _ddt(function(){cur.classList.add('press');appBtn.classList.add('pulse');},5150);
+  _ddt(function(){cur.classList.remove('press');filed.classList.add('show');},5480);
+  _ddt(function(){_physLoop();},9200);
+}
+
+function _resetAdmin(){
+  var pairs=[['dm-pts','0'],['dm-rev','$0'],['dm-notes','0'],['dm-wait','0m']];
+  pairs.forEach(function(p){var el=document.getElementById(p[0]);if(el) el.textContent=p[1];});
+  [0,1,2,3].forEach(function(i){var el=document.getElementById('dq-'+i);if(el) el.classList.remove('show');});
+  document.querySelectorAll('.da-bar').forEach(function(bar){
+    bar.style.transition='none';bar.style.height='0';bar.offsetHeight;bar.style.transition='';
+  });
+}
+
+function _adminLoop(){
+  var pane=document.getElementById('dp-admin');
+  if(!pane||!pane.classList.contains('active')) return;
+  _resetAdmin();
+  var gen=_demoGen;
+  _ddt(function(){if(_demoGen!==gen)return;_demoCountUp('dm-pts',0,47,1200,'','');},300);
+  _ddt(function(){if(_demoGen!==gen)return;_demoCountUp('dm-rev',0,18420,1400,'$','');},300);
+  _ddt(function(){if(_demoGen!==gen)return;_demoCountUp('dm-notes',0,8,900,'','');},300);
+  _ddt(function(){if(_demoGen!==gen)return;_demoCountUp('dm-wait',0,24,950,'','m');},300);
+  [0,1,2,3].forEach(function(i){
+    _ddt(function(){if(_demoGen!==gen)return;var el=document.getElementById('dq-'+i);if(el) el.classList.add('show');},900+i*260);
+  });
+  _ddt(function(){
+    if(_demoGen!==gen) return;
+    document.querySelectorAll('.da-bar').forEach(function(bar,i){
+      setTimeout(function(){bar.style.height=(parseInt(bar.dataset.pct)*65/100)+'px';},i*85);
+    });
+  },1600);
+  _ddt(function(){_adminLoop();},8800);
+}
+
+function _demoCountUp(id,from,to,dur,pre,suf){
+  var el=document.getElementById(id);
+  if(!el) return;
+  var s=performance.now(),gen=_demoGen;
+  (function step(now){
+    if(_demoGen!==gen) return;
+    var p=Math.min((now-s)/dur,1),v=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));
+    el.textContent=pre+(v>=1000?v.toLocaleString():v)+suf;
+    if(p<1) requestAnimationFrame(step);
+  })(performance.now());
 }
 </script>
 </body>
