@@ -303,6 +303,14 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
 .qsend{background:var(--blue);border:none;border-radius:8px;color:#000;cursor:pointer;font-size:.84rem;font-weight:600;padding:.5rem .9rem;transition:opacity .15s}
 .qsend:hover{opacity:.85}
 @media(max-width:600px){#qdrawer{width:calc(100vw - 2rem);right:1rem}#qbtn{right:1rem;bottom:1.5rem}}
+.qhdr-info{flex:1;min-width:0}
+.qclose{background:none;border:none;color:var(--muted);cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:1.05rem;line-height:1;transition:color .15s,background .15s;flex-shrink:0}
+.qclose:hover{color:var(--text);background:rgba(0,180,255,.08)}
+.qtyping{display:flex;align-items:center;gap:4px;padding:.65rem .9rem;background:var(--bg3);border:1px solid var(--border);border-radius:10px;border-bottom-left-radius:2px;align-self:flex-start}
+.qtyping span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:qtdot .9s ease infinite}
+.qtyping span:nth-child(2){animation-delay:.2s}
+.qtyping span:nth-child(3){animation-delay:.4s}
+@keyframes qtdot{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 
 /* ── MISC ────────────────────────────────────── */
 @media(max-width:580px){section{padding:4rem 1.25rem}.stat-grid{grid-template-columns:1fr 1fr}.feat-grid{grid-template-columns:1fr 1fr}}
@@ -1009,6 +1017,7 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
       <h4>Quinn</h4>
       <span>QuickClinic AI &mdash; always online</span>
     </div>
+    <button class="qclose" id="qclose" aria-label="Close chat">&#10005;</button>
   </div>
   <div class="qmsgs" id="qmsgs"></div>
   <div class="qinput-row">
@@ -1164,6 +1173,7 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
   </div>
 </div>
 
+<script>window.QUINN_API_KEY = 'QUINN_KEY_PLACEHOLDER';</script>
 <script>
 'use strict';
 
@@ -1317,50 +1327,19 @@ function initDemoModal(){
 }
 
 /* ── QUINN ──────────────────────────────────────── */
-const FAQ = [
-  { k:['what','quickclinic','about','is it','company','platform'],
-    a:'QuickClinic is an AI-powered workflow automation platform for urgent care and emergency clinics. It automates triage, clinical documentation, and billing inside existing EMR systems — no new app required.' },
-  { k:['how','work','works','process','steps','flow','pipeline'],
-    a:'Patient arrives → AI scores acuity and reimbursement potential → generates a SOAP note draft → physician approves in one click → correct billing codes filed automatically. The whole workflow runs inside the EMR physicians already use.' },
-  { k:['emr','integrat','epic','athena','fhir','connect','system','ehr'],
-    a:'Currently scoping Epic and athenaOne via FHIR R4. Drop-in integration — no rip-and-replace required. The workflow runs natively inside the EMR so physicians never have to leave their existing system.' },
-  { k:['hipaa','compliant','compliance','secure','privacy','phi','data','safe','audit'],
-    a:'Yes. Every AI decision is logged to an immutable audit trail before touching the EMR. No PHI is sent to the AI — only de-identified data. Built for HIPAA-eligible AWS infrastructure from day one.' },
-  { k:['cost','price','pricing','pay','subscription','much','fee','seat'],
-    a:'Monthly subscription per physician seat. Pricing is shared directly with clinic administrators during the pilot conversation — reach out at the summit or use the contact form on this page.' },
-  { k:['result','roi','revenue','save','improve','outcome','impact','gain','benefit','15','50'],
-    a:'Up to 15% revenue increase and 50% reduction in physician documentation time, based on our validation with 22 healthcare stakeholder interviews. Clinics typically recoup the cost within the first month of billing improvements alone.' },
-  { k:['who','team','built','founder','build','made','created','caleb','benjamin','abhi'],
-    a:'Caleb Shin, Benjamin Min, and Abhi Tamatam — UC Riverside INNOVAR Program 2026. Built over five months with deep input from 22 healthcare stakeholder interviews.' },
-  { k:['access','get','start','pilot','demo','try','sign','join','apply'],
-    a:"Email the team or fill out the pilot interest form on this page. We're selecting one urgent care clinic in California to run Phase 5 — a paid pilot with full support. Reach out at the summit too, we'd love to connect." },
-  { k:['status','stage','progress','ready','live','built','done','current','beta','phase'],
-    a:'Private beta. The full AI pipeline is live — triage scoring, SOAP note generation, revenue flagging, Stripe billing, and EMR write-back architecture are all built and tested.' },
-  { k:['aws','cloud','infra','hosting','infrastructure','deploy','summit'],
-    a:'Infrastructure is scoped for AWS using HIPAA-eligible services: ECS Fargate, RDS PostgreSQL, S3 with encryption, and Secrets Manager. We are presenting at AWS Summit today — welcome!' },
-];
-
-function matchFAQ(input){
-  const words = input.toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/);
-  let best = { score:0, a:null };
-  FAQ.forEach(({k,a})=>{
-    let score = 0;
-    k.forEach(keyword=>{
-      if(words.some(w => w.includes(keyword) || keyword.includes(w))) score++;
-    });
-    if(score > best.score) best = {score, a};
-  });
-  if(best.score > 0) return best.a;
-  return "Great question — that's best answered directly by the team. Use the contact form below or come find us at the summit.";
-}
-
 function initQuinn(){
   const btn = document.getElementById('qbtn');
   const drawer = document.getElementById('qdrawer');
   const msgs = document.getElementById('qmsgs');
   const input = document.getElementById('qinput');
   const send = document.getElementById('qsend');
+  const closeBtn = document.getElementById('qclose');
   let open = false;
+  let userEmail = null;
+  let awaitingEmail = false;
+  const history = [];
+
+  const SYSTEM = "You are Quinn, the AI assistant for QuickClinic — an AI-powered workflow automation platform for urgent care and emergency clinics. You help clinic administrators, physicians, and investors understand the product. You know everything about QuickClinic: it automates triage scoring (ESI 1-5), generates SOAP notes, flags billing opportunities (ICD-10/CPT codes), integrates with Epic and athenaOne via FHIR R4, is HIPAA compliant with immutable audit trails, costs a monthly per-physician-seat subscription, was built by Caleb Shin, Benjamin Min, and Abhi Tamatam at UC Riverside INNOVAR 2026, and is currently seeking one pilot clinic in California. Answer any question helpfully and concisely. If asked something you genuinely cannot answer, tell the user you will have the team follow up by email and ask for their email address.";
 
   function addMsg(text, role){
     const m = document.createElement('div');
@@ -1368,27 +1347,106 @@ function initQuinn(){
     m.textContent = text;
     msgs.appendChild(m);
     msgs.scrollTop = msgs.scrollHeight;
+    return m;
+  }
+
+  function addTyping(){
+    const t = document.createElement('div');
+    t.className = 'qtyping';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(t);
+    msgs.scrollTop = msgs.scrollHeight;
+    return t;
   }
 
   setTimeout(()=>{
     addMsg("Hi! I'm Quinn, QuickClinic's AI assistant. Ask me anything about the platform — how it works, pricing, HIPAA compliance, or the pilot program.", 'bot');
   }, 400);
 
-  function toggle(){
-    open = !open;
+  function toggle(v){
+    open = (v !== undefined) ? v : !open;
     drawer.classList.toggle('open', open);
     if(open) input.focus();
   }
 
-  function handleSend(){
+  function isEmail(s){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+  }
+
+  async function handleSend(){
     const v = input.value.trim();
     if(!v) return;
     addMsg(v, 'usr');
     input.value = '';
-    setTimeout(()=>{ addMsg(matchFAQ(v), 'bot'); }, 520);
+    send.disabled = true;
+    input.disabled = true;
+
+    // Email capture flow
+    if(awaitingEmail && isEmail(v)){
+      userEmail = v.trim();
+      awaitingEmail = false;
+      history.push({ role:'user', content: v });
+      const typing = addTyping();
+      try {
+        await fetch('https://formspree.io/f/mqeobvbj', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Accept':'application/json'},
+          body: JSON.stringify({ email: userEmail, source:'quinn-escalation' })
+        });
+      } catch(e){}
+      typing.remove();
+      const reply = 'Got it. The QuickClinic team will follow up within 24 hours.';
+      addMsg(reply, 'bot');
+      history.push({ role:'assistant', content: reply });
+      send.disabled = false;
+      input.disabled = false;
+      input.focus();
+      return;
+    }
+
+    // Claude API call
+    history.push({ role:'user', content: v });
+    const typing = addTyping();
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key': window.QUINN_API_KEY || '',
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-allow-browser':'true'
+        },
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:320,
+          system: SYSTEM,
+          messages: history
+        })
+      });
+      const data = await res.json();
+      typing.remove();
+      let reply;
+      if(res.ok && data.content && data.content[0]){
+        reply = data.content[0].text;
+        history.push({ role:'assistant', content: reply });
+        if(!userEmail && /(email address|your email|please.*email|share.*email)/i.test(reply)){
+          awaitingEmail = true;
+        }
+      } else {
+        reply = "I’m having a little trouble connecting right now — reach out directly at shin.tsp2006@gmail.com or use the contact form below.";
+      }
+      addMsg(reply, 'bot');
+    } catch(err){
+      typing.remove();
+      addMsg("I’m having a little trouble connecting right now — reach out directly at shin.tsp2006@gmail.com or use the contact form below.", 'bot');
+    }
+    send.disabled = false;
+    input.disabled = false;
+    input.focus();
   }
 
-  btn.addEventListener('click', toggle);
+  btn.addEventListener('click', ()=>toggle());
+  closeBtn.addEventListener('click', ()=>toggle(false));
   send.addEventListener('click', handleSend);
   input.addEventListener('keydown', e=>{ if(e.key==='Enter') handleSend(); });
 }
@@ -1530,3 +1588,6 @@ function _demoCountUp(id,from,to,dur,pre,suf){
 </script>
 </body>
 </html>
+cd C:\Users\cshin\Downloads\QuickClinic\apps\landing
+notepad index.html
+
