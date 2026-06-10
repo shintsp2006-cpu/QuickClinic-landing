@@ -1,3 +1,4 @@
+<!-- build: forced refresh -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1408,39 +1409,28 @@ function initQuinn(){
     const typing = addTyping();
     try {
       const res = await fetch('/api/quinn', {
-  method:'POST',
-  headers:{'Content-Type':'application/json'},
-  body: JSON.stringify({ system: SYSTEM, messages: history })
-});
-const data = await res.json();
-typing.remove();
-let reply;
-if(res.ok && data.content && data.content[0]){
-  reply = data.content[0].text;
-  history.push({ role:'assistant', content: reply });
-  if(!userEmail && /(email address|your email|please.*email|share.*email)/i.test(reply)){
-    awaitingEmail = true;
-  }
-} else {
-  reply = "I'm having a little trouble connecting right now — reach out directly at shin.tsp2006@gmail.com or use the contact form below.";
-}
-addMsg(reply, 'bot');
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ system: SYSTEM, messages: history })
+      });
       const data = await res.json();
       typing.remove();
       let reply;
       if(res.ok && data.content && data.content[0]){
         reply = data.content[0].text;
-        history.push({ role:'assistant', content: reply });
+        history.push({ role:’assistant’, content: reply });
         if(!userEmail && /(email address|your email|please.*email|share.*email)/i.test(reply)){
           awaitingEmail = true;
         }
       } else {
+        console.error(‘[quinn] proxy response’, res.status, JSON.stringify(data));
         reply = "I’m having a little trouble connecting right now — reach out directly at shin.tsp2006@gmail.com or use the contact form below.";
       }
-      addMsg(reply, 'bot');
+      addMsg(reply, ‘bot’);
     } catch(err){
       typing.remove();
-      addMsg("I’m having a little trouble connecting right now — reach out directly at shin.tsp2006@gmail.com or use the contact form below.", 'bot');
+      console.error(‘[quinn] fetch error:’, err);
+      addMsg("I’m having a little trouble connecting right now — reach out directly at shin.tsp2006@gmail.com or use the contact form below.", ‘bot’);
     }
     send.disabled = false;
     input.disabled = false;
@@ -1590,6 +1580,3 @@ function _demoCountUp(id,from,to,dur,pre,suf){
 </script>
 </body>
 </html>
-cd C:\Users\cshin\Downloads\QuickClinic\apps\landing
-notepad index.html
-
