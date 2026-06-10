@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuickClinic — Clinical AI for Urgent Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;overflow-x:hidden}
+:root{
+  --bg:#050b1a;--bg2:#071228;--bg3:#0c1c3d;
+  --blue:#00b4ff;--blue2:#0055d4;
+  --glow:rgba(0,180,255,.22);--glow2:rgba(0,180,255,.08);
+  --text:#d4e8ff;--muted:#5e88b0;--dim:#3a5878;
+  --border:rgba(0,180,255,.13);--r:14px;
+  --font-h:'Syne',sans-serif;--font-b:'Inter',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:16px;line-height:1.6;overflow-x:hidden;width:100%}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(0,180,255,.055) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;z-index:0}
+
+/* ── GATE ────────────────────────────────────── */
+#gate{position:fixed;inset:0;z-index:9999;background:#020710;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;transition:opacity .25s ease}
+#gate.hide{opacity:0;pointer-events:none}
+.gate-logo{display:flex;align-items:center;gap:.45rem;font-family:var(--font-h);font-size:2.2rem;font-weight:800;color:var(--text)}
+.gate-plus{color:var(--blue);font-size:2.6rem;line-height:1;filter:drop-shadow(0 0 8px var(--blue))}
+.gate-eyebrow{color:var(--muted);font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;margin-top:-.5rem}
+.gate-form{display:flex;flex-direction:column;align-items:center;gap:.65rem;width:220px}
+.gate-label{color:var(--dim);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;align-self:flex-start}
+.gate-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-h);font-size:1.6rem;font-weight:700;letter-spacing:.4em;padding:.7rem 1.25rem;text-align:center;outline:none;transition:border-color .2s,box-shadow .2s}
+.gate-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--glow2)}
+.gate-btn{width:100%;background:var(--blue);border:none;border-radius:8px;color:#000;cursor:pointer;font-family:var(--font-b);font-size:.9rem;font-weight:600;padding:.7rem;transition:box-shadow .2s,transform .15s}
+.gate-btn:hover{box-shadow:0 0 18px var(--glow);transform:translateY(-1px)}
+.gate-err{color:#ff4d6a;font-size:.78rem;min-height:1em;text-align:center}
+#gate.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+/* ── NAV ─────────────────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:.9rem 2.5rem;transition:background .3s,border-color .3s,backdrop-filter .3s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(5,11,26,.88);backdrop-filter:blur(14px);border-color:var(--border)}
+.nav-logo{font-family:var(--font-h);font-size:1.25rem;font-weight:800;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:.3rem}
+.nav-logo .p{color:var(--blue);filter:drop-shadow(0 0 5px var(--blue))}
+.nav-links{display:flex;align-items:center;gap:1.75rem;list-style:none}
+.nav-links a{color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:transparent;border:1px solid var(--blue);border-radius:6px;color:var(--blue);font-size:.85rem;font-weight:500;padding:.4rem 1.1rem;text-decoration:none;transition:background .2s,color .2s}
+.nav-cta:hover{background:var(--blue);color:#000}
+@media(max-width:860px){.nav-links{display:none}.nav-cta{display:none}}
+
+/* ── HERO ────────────────────────────────────── */
+#hero{position:relative;min-height:auto;display:flex;align-items:center;padding:7rem 2.5rem 4rem;overflow:hidden}
+#hero::after{content:'';position:absolute;top:50%;left:55%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(0,100,255,.07) 0%,transparent 70%);pointer-events:none}
+.hero-content{position:relative;z-index:2;max-width:590px}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:var(--glow2);border:1px solid var(--border);border-radius:100px;color:var(--blue);font-size:.72rem;font-weight:600;letter-spacing:.1em;padding:.3rem .9rem;margin-bottom:1.5rem;text-transform:uppercase}
+.eyebrow .dot{width:6px;height:6px;background:var(--blue);border-radius:50%;box-shadow:0 0 6px var(--blue);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:800;line-height:1.1;letter-spacing:-.025em;margin-bottom:1.25rem}
+.grad{background:linear-gradient(130deg,#e8f4ff 30%,var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{color:var(--muted);font-size:1.05rem;max-width:480px;margin-bottom:2.25rem;line-height:1.75}
+.cta-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2.75rem}
+.btn-p{background:var(--blue);border:none;border-radius:9px;color:#000;cursor:pointer;font-family:var(--font-b);font-size:.9rem;font-weight:600;padding:.85rem 1.85rem;text-decoration:none;transition:box-shadow .2s,transform .15s;display:inline-block}
+.btn-p:hover{box-shadow:0 0 24px var(--glow);transform:translateY(-1px)}
+.btn-g{background:transparent;border:1px solid var(--border);border-radius:9px;color:var(--text);cursor:pointer;font-family:var(--font-b);font-size:.9rem;font-weight:500;padding:.85rem 1.85rem;text-decoration:none;transition:border-color .2s,color .2s;display:inline-block}
+.btn-g:hover{border-color:var(--blue);color:var(--blue)}
+.trust-bar{display:flex;flex-wrap:wrap;gap:1.25rem}
+.trust-item{color:var(--dim);font-size:.78rem;display:flex;align-items:center;gap:.4rem}
+.trust-item::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;box-shadow:0 0 5px var(--blue);flex-shrink:0}
+@media(max-width:860px){#hero{box-sizing:border-box;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start!important;padding:66px 1.5rem 1rem!important;height:auto!important;min-height:0!important}#hero::after{display:none}}
+
+/* ── FLOW VIZ ────────────────────────────────── */
+#flow-viz{position:absolute;top:0;right:0;width:58%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
+.flow-panel{background:rgba(7,18,40,.78);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem 1.1rem 1rem;backdrop-filter:blur(10px);width:min(600px,95%);box-shadow:0 0 60px rgba(0,180,255,.06)}
+.flow-live{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+.flow-live-dot{width:7px;height:7px;background:var(--blue);border-radius:50%;box-shadow:0 0 6px var(--blue);animation:blink 2s ease infinite}
+.flow-live-lbl{color:var(--muted);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
+.flow-svg{width:100%;height:auto;overflow:visible;will-change:transform}
+.flow-svg-mobile{display:none;width:100%;height:auto;overflow:hidden;will-change:transform}
+.fdash{stroke:#00b4ff;stroke-width:1.5;stroke-dasharray:7 4;fill:none;opacity:.55;animation-play-state:paused}
+.site-ready .fdash{animation-play-state:running}
+@keyframes fda{to{stroke-dashoffset:-11}}
+.flow-stats{display:flex;gap:1.25rem;margin-top:.85rem;flex-wrap:wrap}
+.fstat{color:var(--dim);font-size:.72rem;display:flex;align-items:center;gap:.35rem}
+.fstat::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;opacity:.65}
+@media(max-width:860px){
+  #flow-viz{position:relative;top:auto;right:auto;width:100%;height:300px;margin-top:1.5rem}
+  .flow-panel{width:100%;padding:.75rem}
+  .flow-svg{display:none}
+  .flow-svg-mobile{display:block}
+}
+
+/* ── DEMO MODAL ──────────────────────────────── */
+#demo-modal{position:fixed;inset:0;z-index:700;background:rgba(2,7,16,.93);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s}
+#demo-modal.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:880px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 40px rgba(0,180,255,.07)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-hdr h3{font-family:var(--font-h);font-size:1rem;font-weight:700;color:var(--text)}
+.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.3rem;line-height:1;padding:.25rem .5rem;border-radius:6px;transition:color .15s,background .15s}
+.modal-close:hover{color:var(--text);background:var(--bg3)}
+.modal-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg3)}
+.modal-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-family:var(--font-b);font-size:.85rem;font-weight:500;padding:.8rem 1.5rem;transition:color .15s,border-color .15s;margin-bottom:-1px}
+.modal-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.modal-body{overflow-y:auto;flex:1}
+.modal-pane{display:none;padding:1.5rem}
+.modal-pane.active{display:block}
+.phys-wrap{display:grid;grid-template-columns:1fr 1.6fr;gap:1.25rem}
+@media(max-width:640px){.phys-wrap{grid-template-columns:1fr}}
+.pt-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.pt-name{font-family:var(--font-h);font-size:1.05rem;font-weight:700;margin-bottom:.2rem}
+.pt-meta{color:var(--muted);font-size:.8rem;margin-bottom:.9rem}
+.badge{display:inline-block;border-radius:5px;font-size:.7rem;font-weight:700;padding:.18rem .5rem;margin-right:.35rem}
+.esi2{background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.35);color:#ffb347}
+.high-rev{background:rgba(0,180,255,.12);border:1px solid rgba(0,180,255,.3);color:var(--blue)}
+.vital-row{display:flex;gap:.75rem;margin-top:.75rem;flex-wrap:wrap}
+.vital{text-align:center;background:var(--bg2);border-radius:8px;padding:.4rem .7rem}
+.vital-v{font-family:var(--font-h);font-size:1rem;font-weight:700;color:var(--text)}
+.vital-l{font-size:.65rem;color:var(--dim)}
+.soap-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.25rem;display:flex;flex-direction:column}
+.soap-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.soap-hdr h4{font-family:var(--font-h);font-size:.9rem;font-weight:700}
+.ai-tag{background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.25);border-radius:5px;color:var(--blue);font-size:.68rem;font-weight:600;padding:.2rem .5rem}
+.soap-section{margin-bottom:.85rem}
+.soap-label{font-size:.68rem;font-weight:700;color:var(--blue);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.25rem}
+.soap-text{font-size:.82rem;color:var(--text);line-height:1.55}
+.code-row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.4rem 0 1rem}
+.code-chip{background:var(--bg2);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:.72rem;padding:.2rem .55rem}
+.approve-btn{background:var(--blue);border:none;border-radius:8px;color:#000;cursor:pointer;font-family:var(--font-b);font-size:.88rem;font-weight:700;padding:.7rem 1.4rem;margin-top:auto;transition:box-shadow .2s,transform .15s;width:100%}
+.approve-btn:hover{box-shadow:0 0 20px var(--glow);transform:translateY(-1px)}
+.approve-btn.done{background:#00c97a;cursor:default;transform:none;box-shadow:none}
+.admin-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.25rem}
+@media(max-width:600px){.admin-metrics{grid-template-columns:repeat(2,1fr)}}
+.metric-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.metric-v{font-family:var(--font-h);font-size:1.6rem;font-weight:800;color:var(--blue);line-height:1}
+.metric-l{color:var(--muted);font-size:.75rem;margin-top:.3rem}
+.admin-bottom{display:grid;grid-template-columns:1.2fr 1fr;gap:1.25rem}
+@media(max-width:600px){.admin-bottom{grid-template-columns:1fr}}
+.queue-table{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.qt-hdr{padding:.65rem 1rem;border-bottom:1px solid var(--border);font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.qt-row{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid rgba(0,180,255,.06);font-size:.82rem}
+.qt-row:last-child{border-bottom:none}
+.qt-name{flex:1;font-weight:500}
+.qt-rev{color:var(--blue);font-size:.75rem;font-weight:600;white-space:nowrap}
+.chart-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.chart-hdr{font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.9rem}
+.bar-chart{display:flex;align-items:flex-end;gap:.4rem;height:90px}
+.bc-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.bc-bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--blue),var(--blue2));min-height:4px}
+.bc-day{font-size:.6rem;color:var(--dim)}
+.quinn-preview{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.1rem;max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:.65rem}
+.qp-msg{max-width:82%;font-size:.84rem;line-height:1.55;padding:.65rem .9rem;border-radius:10px}
+.qp-msg.bot{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:2px;align-self:flex-start}
+.qp-msg.usr{background:var(--blue);color:#000;align-self:flex-end;border-bottom-right-radius:2px}
+.qp-note{text-align:center;color:var(--dim);font-size:.75rem;margin-top:.5rem}
+
+/* ── SECTION SHARED ──────────────────────────── */
+section{position:relative;z-index:1;padding:6rem 2.5rem}
+.si{max-width:1080px;margin:0 auto;width:100%}
+.s-eye{color:var(--blue);font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.6rem}
+h2{font-family:var(--font-h);font-size:clamp(1.85rem,3.5vw,2.75rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;margin-bottom:.9rem}
+.s-sub{color:var(--muted);font-size:1rem;max-width:540px;line-height:1.75;margin-bottom:3rem}
+.divider{width:48px;height:3px;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:2px;box-shadow:0 0 8px var(--glow);margin-bottom:2rem}
+
+/* Fade-in */
+.fi{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
+.fi.v{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* ── PROBLEM ─────────────────────────────────── */
+#problem{background:linear-gradient(180deg,transparent,var(--bg2) 25%,var(--bg2) 75%,transparent)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.2rem}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.85rem;transition:border-color .2s,box-shadow .2s,transform .2s}
+.stat-card:hover{border-color:rgba(0,180,255,.38);box-shadow:0 0 22px rgba(0,180,255,.07);transform:translateY(-2px)}
+.stat-num{font-family:var(--font-h);font-size:3rem;font-weight:800;color:var(--blue);line-height:1;margin-bottom:.5rem;filter:drop-shadow(0 0 12px rgba(0,180,255,.35))}
+.stat-lbl{color:var(--text);font-size:.9rem;font-weight:500;margin-bottom:.35rem;line-height:1.4}
+.stat-src{color:var(--dim);font-size:.72rem}
+
+/* ── SOLUTION ────────────────────────────────── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:1.2rem}
+.feat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem;position:relative;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:opacity .25s}
+.feat-card:hover{border-color:rgba(0,180,255,.4);transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.4),0 0 20px rgba(0,180,255,.08)}
+.feat-card:hover::before{opacity:1}
+.feat-ico{font-size:1.7rem;margin-bottom:1rem;display:block}
+.feat-title{font-family:var(--font-h);font-size:.975rem;font-weight:700;margin-bottom:.5rem}
+.feat-desc{color:var(--muted);font-size:.855rem;line-height:1.65}
+
+/* ── HOW IT WORKS ────────────────────────────── */
+#hiw{background:linear-gradient(180deg,transparent,var(--bg2) 25%,var(--bg2) 75%,transparent)}
+.steps-wrap{position:relative}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.steps-line{position:absolute;top:21px;left:calc(12.5% + 14px);right:calc(12.5% + 14px);height:1px;background:linear-gradient(90deg,transparent 0%,var(--border) 20%,var(--border) 80%,transparent 100%)}
+.step{text-align:center;padding:1.25rem .75rem}
+.step-n{width:42px;height:42px;background:var(--bg3);border:1.5px solid var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-h);font-size:.85rem;font-weight:800;color:var(--blue);margin:0 auto 1.25rem;position:relative;z-index:1;box-shadow:0 0 14px rgba(0,180,255,.28)}
+.step-title{font-family:var(--font-h);font-size:.95rem;font-weight:700;margin-bottom:.5rem}
+.step-desc{color:var(--muted);font-size:.83rem;line-height:1.6}
+@media(max-width:750px){.steps{grid-template-columns:repeat(2,1fr)}.steps-line{display:none}}
+@media(max-width:460px){.steps{grid-template-columns:1fr}}
+
+/* ── MARKET ──────────────────────────────────── */
+.market-wrap{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+@media(max-width:700px){.market-wrap{grid-template-columns:1fr;gap:2rem}}
+.market-bars{display:flex;flex-direction:column;gap:1.5rem}
+.mbar{display:flex;align-items:center;gap:1.25rem}
+.mbar-track{flex:1;background:var(--bg3);border-radius:8px;height:10px;overflow:hidden}
+.mbar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--blue2),var(--blue));box-shadow:0 0 8px rgba(0,180,255,.4);transition:width 1.5s cubic-bezier(.22,1,.36,1)}
+.mbar-info{width:160px;flex-shrink:0}
+.mbar-tag{font-size:.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.1em}
+.mbar-val{font-family:var(--font-h);font-size:1.65rem;font-weight:800;line-height:1.1}
+.mbar-sub{color:var(--muted);font-size:.76rem}
+.market-path{display:flex;flex-direction:column;gap:.9rem}
+.mpath{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;transition:border-color .2s}
+.mpath.active{border-color:var(--blue);box-shadow:0 0 14px rgba(0,180,255,.12)}
+.mpath-dot{width:10px;height:10px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.mpath.active .mpath-dot{background:var(--blue);box-shadow:0 0 7px var(--blue)}
+.mpath-name{font-weight:600;font-size:.9rem}
+.mpath-note{color:var(--muted);font-size:.78rem}
+
+/* ── WHY US ──────────────────────────────────── */
+#why{background:linear-gradient(180deg,transparent,var(--bg2) 25%,var(--bg2) 75%,transparent)}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+@media(max-width:700px){.why-grid{grid-template-columns:1fr}}
+.why-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:2rem;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.why-card:hover{border-color:rgba(0,180,255,.4);box-shadow:0 0 26px rgba(0,180,255,.07)}
+.why-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:opacity .2s}
+.why-card:hover::after{opacity:1}
+.why-n{font-family:var(--font-h);font-size:2.5rem;font-weight:800;color:var(--glow2);line-height:1;margin-bottom:.75rem;-webkit-text-stroke:1px rgba(0,180,255,.2)}
+.why-title{font-family:var(--font-h);font-size:1.05rem;font-weight:800;margin-bottom:.65rem}
+.why-desc{color:var(--muted);font-size:.875rem;line-height:1.65;margin-bottom:.85rem}
+.why-vs{display:inline-block;background:rgba(255,70,90,.07);border:1px solid rgba(255,70,90,.2);border-radius:5px;color:#ff7a8a;font-size:.7rem;font-weight:600;padding:.2rem .55rem}
+
+/* ── TEAM ────────────────────────────────────── */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem}
+@media(max-width:650px){.team-grid{grid-template-columns:1fr}}
+.team-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:2rem;text-align:center;transition:border-color .2s,transform .2s}
+.team-card:hover{border-color:rgba(0,180,255,.38);transform:translateY(-3px)}
+.avatar{width:62px;height:62px;background:linear-gradient(135deg,var(--blue2),var(--blue));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-h);font-size:1.25rem;font-weight:800;color:#fff;margin:0 auto 1.2rem;box-shadow:0 0 18px rgba(0,180,255,.28)}
+.team-name{font-family:var(--font-h);font-size:1.05rem;font-weight:700;margin-bottom:.2rem}
+.team-role{color:var(--blue);font-size:.8rem;font-weight:500;letter-spacing:.05em}
+.team-note{color:var(--dim);font-size:.78rem;margin-top:.5rem;line-height:1.5}
+.team-footer{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.75rem;display:flex;flex-wrap:wrap;gap:.75rem 2rem;align-items:center}
+.tf-item{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.82rem}
+.tf-item .n{font-family:var(--font-h);font-size:1.25rem;font-weight:800;color:var(--blue)}
+
+/* ── PILOT CTA ───────────────────────────────── */
+#pilot{background:linear-gradient(135deg,#07112a,#040e20)}
+#pilot::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--blue) 50%,transparent 100%);opacity:.5}
+.pilot-wrap{display:grid;grid-template-columns:1fr auto;gap:4rem;align-items:center;max-width:900px;margin:0 auto}
+@media(max-width:700px){.pilot-wrap{grid-template-columns:1fr;gap:2rem}}
+.pilot-form{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+.pilot-input{flex:1;min-width:210px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-b);font-size:.9rem;padding:.8rem 1.1rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.pilot-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--glow2)}
+.pilot-input::placeholder{color:var(--dim)}
+.pilot-btn{background:var(--blue);border:none;border-radius:9px;color:#000;cursor:pointer;font-family:var(--font-b);font-size:.9rem;font-weight:600;padding:.8rem 1.65rem;white-space:nowrap;transition:box-shadow .2s,transform .15s}
+.pilot-btn:hover{box-shadow:0 0 22px var(--glow);transform:translateY(-1px)}
+.pilot-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+.pilot-ok{display:none;color:var(--blue);font-size:.875rem;margin-top:.5rem;align-items:center;gap:.4rem}
+.pilot-ok.show{display:flex}
+.pilot-note{color:var(--dim);font-size:.78rem;margin-top:.65rem;line-height:1.5}
+.qr-block{display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.qr-svg-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px}
+.qr-lbl{color:var(--muted);font-size:.76rem;text-align:center;max-width:130px;line-height:1.4}
+.connect-wrap{text-align:center;max-width:560px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+.connect-sub{color:var(--muted);font-size:1rem;margin-bottom:1.75rem;line-height:1.75;max-width:420px}
+.connect-wrap .pilot-form{justify-content:center}
+.connect-links{display:flex;flex-direction:column;gap:.65rem;margin-top:1.5rem;margin-bottom:.75rem}
+.connect-link{color:var(--blue);font-size:.9rem;font-weight:500;text-decoration:none;transition:opacity .15s;letter-spacing:.01em}
+.connect-link:hover{opacity:.7}
+
+/* ── FOOTER ──────────────────────────────────── */
+footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem;text-align:center;position:relative;z-index:1}
+.footer-logo{font-family:var(--font-h);font-size:1.2rem;font-weight:800;margin-bottom:.35rem}
+.footer-logo .p{color:var(--blue)}
+.footer-sub{color:var(--muted);font-size:.78rem;margin-bottom:1rem}
+.footer-links{display:flex;gap:1.5rem;justify-content:center;margin-bottom:1rem}
+.footer-links a{color:var(--dim);font-size:.78rem;text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--text)}
+.footer-disc{color:#1e3455;font-size:.68rem;max-width:600px;margin:0 auto;line-height:1.6}
+
+/* ── QUINN ───────────────────────────────────── */
+#qbtn{position:fixed;bottom:2rem;right:2rem;z-index:600;background:var(--blue);border:none;border-radius:100px;color:#000;cursor:pointer;display:flex;align-items:center;gap:.55rem;font-family:var(--font-b);font-size:.875rem;font-weight:600;padding:.72rem 1.2rem;box-shadow:0 4px 22px rgba(0,180,255,.4);transition:transform .15s,box-shadow .15s}
+#qbtn:hover{transform:scale(1.04);box-shadow:0 6px 30px rgba(0,180,255,.55)}
+.qpulse{width:9px;height:9px;background:#fff;border-radius:50%;position:relative}
+.qpulse::after{content:'';position:absolute;inset:-3px;border:2px solid rgba(255,255,255,.45);border-radius:50%;animation:qp 2s ease infinite}
+@keyframes qp{0%{transform:scale(1);opacity:.5}70%{transform:scale(1.8);opacity:0}100%{transform:scale(1.8);opacity:0}}
+#qdrawer{position:fixed;bottom:5.5rem;right:2rem;z-index:600;width:355px;max-height:480px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;box-shadow:0 22px 65px rgba(0,0,0,.6),0 0 35px rgba(0,180,255,.07);display:flex;flex-direction:column;overflow:hidden;transform:scale(.95) translateY(10px);opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease}
+#qdrawer.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+.qhdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:.9rem 1.2rem;display:flex;align-items:center;gap:.75rem}
+.qav{width:34px;height:34px;background:linear-gradient(135deg,var(--blue2),var(--blue));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.qhdr-info h4{font-size:.9rem;font-weight:600;line-height:1.2}
+.qhdr-info span{font-size:.73rem;color:var(--blue)}
+.qmsgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem;scroll-behavior:smooth}
+.qmsgs::-webkit-scrollbar{width:3px}
+.qmsgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.qm{max-width:86%;font-size:.84rem;line-height:1.55;padding:.65rem .9rem;border-radius:10px;animation:mi .2s ease}
+@keyframes mi{from{opacity:0;transform:translateY(5px)}}
+.qm.bot{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:2px;align-self:flex-start}
+.qm.usr{background:var(--blue);color:#000;align-self:flex-end;border-bottom-right-radius:2px}
+.qinput-row{display:flex;gap:.5rem;padding:.75rem 1rem;border-top:1px solid var(--border)}
+.qinput{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:.84rem;padding:.5rem .85rem;outline:none;transition:border-color .2s}
+.qinput:focus{border-color:var(--blue)}
+.qsend{background:var(--blue);border:none;border-radius:8px;color:#000;cursor:pointer;font-size:.84rem;font-weight:600;padding:.5rem .9rem;transition:opacity .15s}
+.qsend:hover{opacity:.85}
+@media(max-width:600px){#qdrawer{width:calc(100vw - 2rem);right:1rem}#qbtn{right:1rem;bottom:1.5rem}}
+.qhdr-info{flex:1;min-width:0}
+.qclose{background:none;border:none;color:var(--muted);cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:1.05rem;line-height:1;transition:color .15s,background .15s;flex-shrink:0}
+.qclose:hover{color:var(--text);background:rgba(0,180,255,.08)}
+.qtyping{display:flex;align-items:center;gap:4px;padding:.65rem .9rem;background:var(--bg3);border:1px solid var(--border);border-radius:10px;border-bottom-left-radius:2px;align-self:flex-start}
+.qtyping span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:qtdot .9s ease infinite}
+.qtyping span:nth-child(2){animation-delay:.2s}
+.qtyping span:nth-child(3){animation-delay:.4s}
+@keyframes qtdot{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* ── MISC ────────────────────────────────────── */
+@media(max-width:580px){section{padding:4rem 1.25rem}.stat-grid{grid-template-columns:1fr 1fr}.feat-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.stat-grid{grid-template-columns:1fr}.stat-card{width:100%;padding:1rem}.stat-num{font-size:2rem}}
+
+/* ── MOBILE UX PASS (≤860px) ─────────────────── */
+@media(max-width:860px){
+  /* Section spacing */
+  section{padding:3rem 1.25rem}
+
+  /* Typography */
+  h1{font-size:18px;line-height:1.2;margin-bottom:.75rem}
+  h2{font-size:20px;line-height:1.25}
+  .hero-sub{display:none}
+  .feat-desc,.step-desc,.why-desc,.mpath-note,.tf-item{font-size:.875rem}
+  .s-eye,.eyebrow,.stat-src,.flow-live-lbl,.fstat,.vital-l,.soap-label,.bc-day,.code-chip,.ai-tag,.qp-note,.footer-disc,.badge{font-size:.75rem}
+
+  /* Hero: text only, hide flow viz / eyebrow / trust bar */
+  .eyebrow{display:none}
+  .hero-content{order:0;width:100%}
+  #flow-viz{display:none}
+  .trust-bar{display:none}
+  .btn-p,.btn-g{padding:10px 1.25rem}
+  .cta-row{gap:8px;margin-bottom:0;margin-top:1rem}
+
+  /* Grids → single column */
+  .feat-grid{grid-template-columns:1fr}
+
+  /* Cards / panels */
+  .feat-card,.why-card,.team-card{padding:1rem}
+  .why-n{font-size:2rem}
+  .mbar-val{font-size:1.3rem}
+
+  /* Demo modal: full screen */
+  #demo-modal{padding:0}
+  .modal-box{width:100vw;height:100vh;max-height:100vh;max-width:100%;border-radius:0}
+  .modal-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .modal-tab{white-space:nowrap;flex-shrink:0}
+  .modal-pane{padding:1rem}
+  .phys-wrap{grid-template-columns:1fr}
+  .admin-metrics{grid-template-columns:repeat(2,1fr)}
+  .admin-bottom{grid-template-columns:1fr}
+
+  /* Quinn: full-width bottom sheet */
+  #qdrawer{left:0;right:0;bottom:0;width:100%;max-height:70vh;border-radius:18px 18px 0 0;transform:translateY(110%)}
+  #qdrawer.open{transform:translateY(0)}
+  #qbtn{right:1rem;bottom:1.5rem}
+
+  /* Touch targets */
+  .btn-p,.btn-g,.pilot-btn,.approve-btn,.gate-btn,.qsend,.modal-tab{min-height:44px}
+}
+
+/* ── MOBILE UX PASS (≤480px) ─────────────────── */
+@media(max-width:480px){
+  h2{font-size:18px}
+  .feat-grid{grid-template-columns:1fr}
+  .cta-row{flex-direction:column}
+  .btn-p,.btn-g{width:100%;text-align:center;justify-content:center}
+  .pilot-form{flex-direction:column}
+  .pilot-input{min-width:0;width:100%}
+  .pilot-btn{width:100%}
+  .trust-bar{flex-direction:column;gap:.5rem}
+}
+
+/* ── INTERACTIVE DEMO ────────────────────────── */
+#demo-section{background:linear-gradient(180deg,transparent,var(--bg2) 20%,var(--bg2) 80%,transparent)}
+.demo-window{background:var(--bg2);border:1px solid rgba(0,180,255,.22);border-radius:18px;overflow:hidden;box-shadow:0 0 80px rgba(0,180,255,.07),0 32px 80px rgba(0,0,0,.55);max-width:880px;margin:0 auto}
+.demo-titlebar{background:#06111f;border-bottom:1px solid var(--border);padding:.7rem 1.2rem;display:flex;align-items:center;gap:.8rem;flex-shrink:0}
+.demo-dots{display:flex;gap:.42rem}
+.demo-dot{width:12px;height:12px;border-radius:50%}
+.demo-dot:nth-child(1){background:#ff5f57}
+.demo-dot:nth-child(2){background:#febc2e}
+.demo-dot:nth-child(3){background:#28c840}
+.demo-win-title{flex:1;text-align:center;font-size:.75rem;color:var(--muted);font-family:var(--font-b);letter-spacing:.02em}
+.demo-live-badge{display:flex;align-items:center;gap:.35rem;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.28);border-radius:100px;padding:.18rem .6rem;font-size:.65rem;font-weight:700;color:#00c97a;letter-spacing:.06em;white-space:nowrap;flex-shrink:0}
+.demo-live-dot{width:6px;height:6px;background:#00c97a;border-radius:50%;box-shadow:0 0 5px #00c97a;animation:blink 1.5s ease infinite}
+.demo-tabs-bar{display:flex;border-bottom:1px solid var(--border);background:#06111f}
+.demo-tab-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-family:var(--font-b);font-size:.85rem;font-weight:500;padding:.75rem 1.4rem;transition:color .15s,border-color .15s;margin-bottom:-1px;white-space:nowrap}
+.demo-tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.demo-body{background:var(--bg2);overflow:hidden}
+.demo-pane{display:none;padding:1.2rem;position:relative;min-height:360px}
+.demo-pane.active{display:block}
+.dp-layout{display:grid;grid-template-columns:1fr 1.6fr;gap:1rem}
+@media(max-width:680px){.dp-layout{grid-template-columns:1fr}}
+.dp-patient{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1rem}
+.dp-pt-name{font-family:var(--font-h);font-size:.95rem;font-weight:700;margin-bottom:.15rem}
+.dp-pt-meta{color:var(--muted);font-size:.74rem;margin-bottom:.65rem}
+.dp-vitals{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.7rem}
+.dp-vital{background:var(--bg2);border-radius:6px;padding:.28rem .52rem;text-align:center}
+.dp-vital-v{font-family:var(--font-h);font-size:.86rem;font-weight:700}
+.dp-vital-l{font-size:.57rem;color:var(--dim)}
+.dp-badges{display:flex;gap:.35rem;margin-bottom:.75rem;flex-wrap:wrap}
+.dp-gen-btn{background:var(--blue);border:none;border-radius:8px;color:#000;cursor:default;font-family:var(--font-b);font-size:.79rem;font-weight:600;padding:.5rem .9rem;width:100%;text-align:center;transition:box-shadow .2s,filter .2s}
+.dp-gen-btn.pulse{box-shadow:0 0 22px var(--glow);filter:brightness(1.15)}
+.dp-soap{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1rem;opacity:0;transform:translateY(10px);transition:opacity .4s ease,transform .4s ease}
+.dp-soap.show{opacity:1;transform:none}
+.dp-soap-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.dp-soap-hdr h4{font-family:var(--font-h);font-size:.84rem;font-weight:700}
+.dp-soap-s{margin-bottom:.6rem}
+.dp-soap-lbl{font-size:.61rem;font-weight:700;color:var(--blue);letter-spacing:.13em;text-transform:uppercase;margin-bottom:.16rem}
+.dp-soap-txt{font-size:.75rem;color:var(--text);line-height:1.5}
+.dp-approve-btn{background:rgba(0,180,255,.07);border:1.5px solid rgba(0,180,255,.28);border-radius:8px;color:var(--blue);cursor:default;font-family:var(--font-b);font-size:.79rem;font-weight:600;padding:.5rem .9rem;width:100%;margin-top:.65rem;text-align:center;transition:background .18s,color .18s,box-shadow .18s}
+.dp-approve-btn.pulse{background:var(--blue);color:#000;box-shadow:0 0 22px var(--glow)}
+.dp-filed{display:flex;align-items:center;gap:.4rem;color:#00c97a;font-size:.78rem;font-weight:600;margin-top:.6rem;opacity:0;transition:opacity .3s}
+.dp-filed.show{opacity:1}
+.dp-cursor{position:absolute;pointer-events:none;z-index:20;opacity:0;transition:left .65s cubic-bezier(.4,0,.2,1),top .65s cubic-bezier(.4,0,.2,1),opacity .2s;left:50%;top:50%}
+.dp-cursor svg{width:18px;height:22px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.8))}
+.dp-cursor.show{opacity:1}
+.dp-cursor.press{transform:scale(.82);transition:left .65s cubic-bezier(.4,0,.2,1),top .65s cubic-bezier(.4,0,.2,1),opacity .2s,transform .08s}
+.da-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1rem}
+@media(max-width:600px){.da-metrics{grid-template-columns:repeat(2,1fr)}}
+.da-metric{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.75rem}
+.da-metric-v{font-family:var(--font-h);font-size:1.35rem;font-weight:800;color:var(--blue);line-height:1;margin-bottom:.18rem}
+.da-metric-l{color:var(--muted);font-size:.67rem}
+.da-queue{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1rem}
+.da-q-hdr{padding:.48rem .85rem;border-bottom:1px solid var(--border);font-size:.66rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.da-q-row{display:flex;align-items:center;gap:.5rem;padding:.52rem .85rem;border-bottom:1px solid rgba(0,180,255,.06);font-size:.77rem;opacity:0;transform:translateX(-6px);transition:opacity .3s ease,transform .3s ease}
+.da-q-row:last-child{border-bottom:none}
+.da-q-row.show{opacity:1;transform:none}
+.da-q-name{font-weight:600;width:28px;flex-shrink:0}
+.da-q-cc{flex:1;color:var(--muted);font-size:.74rem}
+.da-q-rev{color:var(--blue);font-size:.72rem;font-weight:600;white-space:nowrap}
+.da-chart{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.85rem}
+.da-chart-lbl{font-size:.7rem;font-weight:600;color:var(--muted);margin-bottom:.65rem}
+.da-bars{display:flex;align-items:flex-end;gap:.28rem;height:65px}
+.da-bar-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem}
+.da-bar{width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--blue),var(--blue2));height:0;transition:height .85s cubic-bezier(.22,1,.36,1)}
+.da-bar-day{font-size:.55rem;color:var(--dim)}
+</style>
+</head>
+<body>
+
+<!-- ── GATE ──────────────────────────────────── -->
+<div id="gate">
+  <div class="gate-logo">Quick<span class="gate-plus">+</span>Clinic</div>
+  <div class="gate-eyebrow">AWS Summit Demo &middot; Phase 5 Pilot</div>
+  <div class="gate-form">
+    <div class="gate-label">Access Code</div>
+    <input id="gate-input" class="gate-input" type="password" maxlength="6" placeholder="····" autocomplete="off" spellcheck="false">
+    <button class="gate-btn" id="gate-btn">Enter</button>
+    <div class="gate-err" id="gate-err"></div>
+  </div>
+</div>
+
+<!-- ── NAV ───────────────────────────────────── -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">Quick<span class="p">+</span>Clinic</a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#hiw">How It Works</a></li>
+    <li><a href="#market">Market</a></li>
+    <li><a href="#team">Team</a></li>
+  </ul>
+  <a href="#pilot" class="nav-cta">Request Pilot</a>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────── -->
+<section id="hero">
+  <div id="flow-viz" aria-hidden="true">
+    <div class="flow-panel">
+      <div class="flow-live">
+        <div class="flow-live-dot"></div>
+        <span class="flow-live-lbl">Live AI Pipeline</span>
+      </div>
+      <svg class="flow-svg" viewBox="0 0 760 175" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="ng" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="7" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="dg" x="-150%" y="-150%" width="400%" height="400%">
+            <feGaussianBlur stdDeviation="5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <path id="tp" d="M75,82 L225,82 L375,82 L525,82 L675,82"/>
+        </defs>
+
+        <!-- Dashed connectors -->
+        <line x1="105" y1="82" x2="195" y2="82" class="fdash" style="animation:fda .8s linear infinite 0s"/>
+        <line x1="255" y1="82" x2="345" y2="82" class="fdash" style="animation:fda .8s linear infinite .2s"/>
+        <line x1="405" y1="82" x2="495" y2="82" class="fdash" style="animation:fda .8s linear infinite .4s"/>
+        <line x1="555" y1="82" x2="645" y2="82" class="fdash" style="animation:fda .8s linear infinite .6s"/>
+
+        <!-- Traveling dot (rendered before node fills so it hides underneath) -->
+        <circle r="6" fill="#00ccff" filter="url(#dg)">
+          <animateMotion dur="3.5s" repeatCount="indefinite" calcMode="linear">
+            <mpath href="#tp"/>
+          </animateMotion>
+        </circle>
+
+        <!-- Node 1: Patient Arrives -->
+        <circle cx="75" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin="0s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <circle cx="75" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="75" y="87" text-anchor="middle" font-family="Syne,sans-serif" font-size="15" font-weight="700" fill="#00ccff">P</text>
+        <text x="75" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Patient Arrives</text>
+
+        <!-- Node 2: AI Triage -->
+        <circle cx="225" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin=".6s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin=".6s"/>
+        </circle>
+        <circle cx="225" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="225" y="87" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#00ccff">AI</text>
+        <text x="225" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">AI Triage</text>
+
+        <!-- Node 3: SOAP Note Generated -->
+        <circle cx="375" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+        </circle>
+        <circle cx="375" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="375" y="87" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#00ccff">Rx</text>
+        <text x="375" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">SOAP Note</text>
+        <text x="375" y="142" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Generated</text>
+
+        <!-- Node 4: Physician Approves -->
+        <circle cx="525" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+        </circle>
+        <circle cx="525" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="525" y="88" text-anchor="middle" font-family="Syne,sans-serif" font-size="17" font-weight="700" fill="#00ccff">&#10003;</text>
+        <text x="525" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Physician</text>
+        <text x="525" y="142" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Approves</text>
+
+        <!-- Node 5: Revenue Captured -->
+        <circle cx="675" cy="82" r="30" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="30;52" dur="2.5s" repeatCount="indefinite" begin="2.4s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="2.4s"/>
+        </circle>
+        <circle cx="675" cy="82" r="30" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng)"/>
+        <text x="675" y="88" text-anchor="middle" font-family="Syne,sans-serif" font-size="17" font-weight="700" fill="#00ccff">$</text>
+        <text x="675" y="129" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Revenue</text>
+        <text x="675" y="142" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#5e88b0">Captured</text>
+      </svg>
+
+      <!-- Mobile compact SVG (viewBox 350×150, shown at ≤860px) -->
+      <svg class="flow-svg-mobile" viewBox="0 0 350 150" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="ng-m" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="dg-m" x="-150%" y="-150%" width="400%" height="400%">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <path id="tp-m" d="M35,58 L105,58 L175,58 L245,58 L315,58"/>
+        </defs>
+
+        <!-- Dashed connectors -->
+        <line x1="58" y1="58" x2="82" y2="58" class="fdash" style="animation:fda .8s linear infinite 0s"/>
+        <line x1="128" y1="58" x2="152" y2="58" class="fdash" style="animation:fda .8s linear infinite .2s"/>
+        <line x1="198" y1="58" x2="222" y2="58" class="fdash" style="animation:fda .8s linear infinite .4s"/>
+        <line x1="268" y1="58" x2="292" y2="58" class="fdash" style="animation:fda .8s linear infinite .6s"/>
+
+        <!-- Traveling dot (rendered before node fills so it hides underneath) -->
+        <circle r="5" fill="#00ccff" filter="url(#dg-m)">
+          <animateMotion dur="3.5s" repeatCount="indefinite" calcMode="linear">
+            <mpath href="#tp-m"/>
+          </animateMotion>
+        </circle>
+
+        <!-- Node 1: Patient Arrives -->
+        <circle cx="35" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin="0s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <circle cx="35" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="35" y="63" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#00ccff">P</text>
+        <text x="35" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Patient</text>
+        <text x="35" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Arrives</text>
+
+        <!-- Node 2: AI Triage -->
+        <circle cx="105" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin=".6s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin=".6s"/>
+        </circle>
+        <circle cx="105" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="105" y="63" text-anchor="middle" font-family="Syne,sans-serif" font-size="10" font-weight="700" fill="#00ccff">AI</text>
+        <text x="105" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">AI</text>
+        <text x="105" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Triage</text>
+
+        <!-- Node 3: SOAP Note -->
+        <circle cx="175" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+        </circle>
+        <circle cx="175" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="175" y="63" text-anchor="middle" font-family="Syne,sans-serif" font-size="10" font-weight="700" fill="#00ccff">Rx</text>
+        <text x="175" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">SOAP</text>
+        <text x="175" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Note</text>
+
+        <!-- Node 4: Physician Approves -->
+        <circle cx="245" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+        </circle>
+        <circle cx="245" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="245" y="64" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" font-weight="700" fill="#00ccff">&#10003;</text>
+        <text x="245" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">MD</text>
+        <text x="245" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Approves</text>
+
+        <!-- Node 5: Revenue Captured -->
+        <circle cx="315" cy="58" r="22" fill="none" stroke="#00b4ff" stroke-width="1" opacity=".5">
+          <animate attributeName="r" values="22;42" dur="2.5s" repeatCount="indefinite" begin="2.4s"/>
+          <animate attributeName="opacity" values=".5;0" dur="2.5s" repeatCount="indefinite" begin="2.4s"/>
+        </circle>
+        <circle cx="315" cy="58" r="22" fill="#071228" stroke="#00b4ff" stroke-width="1.5" filter="url(#ng-m)"/>
+        <text x="315" y="64" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" font-weight="700" fill="#00ccff">$</text>
+        <text x="315" y="107" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Revenue</text>
+        <text x="315" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#5e88b0">Captured</text>
+      </svg>
+
+      <div class="flow-stats">
+        <span class="fstat">ESI 1&ndash;5 Scoring</span>
+        <span class="fstat">FHIR R4</span>
+        <span class="fstat">Audit-First</span>
+        <span class="fstat">HIPAA-Eligible</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-content">
+    <div class="eyebrow"><span class="dot"></span>AWS Summit Demo &middot; Phase 5 Pilot Open</div>
+    <h1>The AI Layer<br>Urgent Care Has<br><span class="grad">Been Waiting For.</span></h1>
+    <p class="hero-sub">QuickClinic automates triage, clinical documentation, and billing — embedded inside Epic and athenaOne. No new app. No rip-and-replace.</p>
+    <div class="cta-row">
+      <a href="#pilot" class="btn-p">Request Pilot Access</a>
+      <button class="btn-g" id="demo-open-btn">See It in Action &#9654;</button>
+    </div>
+    <div class="trust-bar">
+      <span class="trust-item">22 Healthcare Interviews Validated</span>
+      <span class="trust-item">HIPAA-Eligible Infrastructure</span>
+      <span class="trust-item">Epic &amp; athenaOne FHIR R4</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── INTERACTIVE DEMO ──────────────────────── -->
+<section id="demo-section">
+  <div class="si">
+    <div class="fi"><div class="s-eye">See It Live</div></div>
+    <div class="fi d1"><h2>Watch it work.</h2></div>
+    <div class="fi d2"><p class="s-sub">From patient arrival to filed note in under 90 seconds &mdash; no extra clicks, no new tab.</p></div>
+    <div class="demo-window fi d3">
+      <div class="demo-titlebar">
+        <div class="demo-dots"><span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span></div>
+        <span class="demo-win-title">QuickClinic &mdash; Live Demo</span>
+        <div class="demo-live-badge"><span class="demo-live-dot"></span>LIVE</div>
+      </div>
+      <div class="demo-tabs-bar">
+        <button class="demo-tab-btn active" data-demo="phys">Physician View</button>
+        <button class="demo-tab-btn" data-demo="admin">Admin View</button>
+      </div>
+      <div class="demo-body">
+
+        <!-- PHYSICIAN PANE -->
+        <div class="demo-pane active" id="dp-phys">
+          <div class="dp-cursor" id="demo-cur"><svg viewBox="0 0 18 22" fill="none"><path d="M0 0v16l4.5-4L7 18.5l2-1L6.5 11H11z" fill="white" stroke="rgba(0,0,0,.3)" stroke-width=".7"/></svg></div>
+          <div class="dp-layout">
+            <div>
+              <div class="dp-patient">
+                <div class="dp-pt-name">J.M. &mdash; 38F</div>
+                <div class="dp-pt-meta">Chest pain &middot; onset 2 hours</div>
+                <div class="dp-vitals">
+                  <div class="dp-vital"><div class="dp-vital-v">142/88</div><div class="dp-vital-l">BP</div></div>
+                  <div class="dp-vital"><div class="dp-vital-v">96</div><div class="dp-vital-l">HR</div></div>
+                  <div class="dp-vital"><div class="dp-vital-v">98%</div><div class="dp-vital-l">SpO2</div></div>
+                  <div class="dp-vital"><div class="dp-vital-v">98.6</div><div class="dp-vital-l">Temp</div></div>
+                </div>
+                <div class="dp-badges">
+                  <span class="badge esi2">ESI 2</span>
+                  <span class="badge high-rev">High Revenue</span>
+                </div>
+                <button class="dp-gen-btn" id="dg-btn">Generate Note &rarr;</button>
+              </div>
+            </div>
+            <div>
+              <div class="dp-soap" id="dg-soap">
+                <div class="dp-soap-hdr">
+                  <h4>SOAP Note Draft</h4>
+                  <span class="ai-tag">AI Generated</span>
+                </div>
+                <div class="dp-soap-s"><div class="dp-soap-lbl">Subjective</div><div class="dp-soap-txt">38F with acute chest pain 8/10, onset 2h, radiating to left arm. Diaphoresis noted.</div></div>
+                <div class="dp-soap-s"><div class="dp-soap-lbl">Objective</div><div class="dp-soap-txt">BP 142/88, HR 96, SpO2 98%. EKG: ST changes V2&ndash;V4. Troponin pending.</div></div>
+                <div class="dp-soap-s"><div class="dp-soap-lbl">Assessment</div><div class="dp-soap-txt">R/O ACS, probable NSTEMI. ICD-10: I21.4, R07.9. CPT: 99285, 93000.</div></div>
+                <div class="dp-soap-s"><div class="dp-soap-lbl">Plan</div><div class="dp-soap-txt">ASA 325 mg, IV access, serial troponins q3h, cardiology consult, admit for observation.</div></div>
+                <button class="dp-approve-btn" id="da-btn">Approve &amp; File to EMR &rarr;</button>
+                <div class="dp-filed" id="df-msg">&#10003;&nbsp; Note filed to Epic EMR</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN PANE -->
+        <div class="demo-pane" id="dp-admin">
+          <div class="da-metrics">
+            <div class="da-metric"><div class="da-metric-v" id="dm-pts">0</div><div class="da-metric-l">Patients Today</div></div>
+            <div class="da-metric"><div class="da-metric-v" id="dm-rev">$0</div><div class="da-metric-l">Revenue Captured</div></div>
+            <div class="da-metric"><div class="da-metric-v" id="dm-notes">0</div><div class="da-metric-l">Pending Notes</div></div>
+            <div class="da-metric"><div class="da-metric-v" id="dm-wait">0m</div><div class="da-metric-l">Avg Wait Time</div></div>
+          </div>
+          <div class="da-queue">
+            <div class="da-q-hdr">Priority Queue</div>
+            <div class="da-q-row" id="dq-0"><span class="da-q-name">J.M.</span><span class="da-q-cc">Chest Pain</span><span class="badge esi2" style="flex-shrink:0">ESI 2</span><span class="da-q-rev">$420</span></div>
+            <div class="da-q-row" id="dq-1"><span class="da-q-name">T.K.</span><span class="da-q-cc">Laceration</span><span class="badge" style="background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.3);color:#ffd060;flex-shrink:0">ESI 3</span><span class="da-q-rev">$180</span></div>
+            <div class="da-q-row" id="dq-2"><span class="da-q-name">R.S.</span><span class="da-q-cc">Upper Resp.</span><span class="badge" style="background:rgba(94,136,176,.1);border:1px solid rgba(94,136,176,.25);color:var(--muted);flex-shrink:0">ESI 4</span><span class="da-q-rev" style="color:var(--muted)">$95</span></div>
+            <div class="da-q-row" id="dq-3"><span class="da-q-name">M.C.</span><span class="da-q-cc">Ankle Sprain</span><span class="badge" style="background:rgba(94,136,176,.1);border:1px solid rgba(94,136,176,.25);color:var(--muted);flex-shrink:0">ESI 4</span><span class="da-q-rev" style="color:var(--muted)">$140</span></div>
+          </div>
+          <div class="da-chart">
+            <div class="da-chart-lbl">Revenue &mdash; Last 7 Days</div>
+            <div class="da-bars">
+              <div class="da-bar-w"><div class="da-bar" data-pct="67"></div><div class="da-bar-day">Mon</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="81"></div><div class="da-bar-day">Tue</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="55"></div><div class="da-bar-day">Wed</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="88"></div><div class="da-bar-day">Thu</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="72"></div><div class="da-bar-day">Fri</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="49"></div><div class="da-bar-day">Sat</div></div>
+              <div class="da-bar-w"><div class="da-bar" data-pct="95"></div><div class="da-bar-day">Sun</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROBLEM ────────────────────────────────── -->
+<section id="problem">
+  <div class="si">
+    <div class="fi"><div class="s-eye">The Problem</div></div>
+    <div class="fi d1"><h2>Clinics are drowning<br>in admin work.</h2></div>
+    <div class="fi d2"><p class="s-sub">Not from lack of patients. From lack of automation. Every hour a physician spends charting is an hour they aren't seeing the next patient.</p></div>
+    <div class="stat-grid">
+      <div class="stat-card fi d1">
+        <div class="stat-num counter" data-to="33" data-suffix="%">33%</div>
+        <div class="stat-lbl">of every physician shift lost to charting and documentation</div>
+        <div class="stat-src">Source: AMA Administrative Burden Study</div>
+      </div>
+      <div class="stat-card fi d2">
+        <div class="stat-num counter" data-to="50" data-suffix="%">50%</div>
+        <div class="stat-lbl">of ER visits are non-emergent, clogging high-cost facilities</div>
+        <div class="stat-src">Source: ACEP</div>
+      </div>
+      <div class="stat-card fi d3">
+        <div class="stat-num counter" data-to="4.6" data-prefix="$" data-suffix="B" data-dec="1">$4.6B</div>
+        <div class="stat-lbl">lost annually to physician burnout across the U.S. healthcare system</div>
+        <div class="stat-src">Source: Maslach Burnout Inventory</div>
+      </div>
+      <div class="stat-card fi d4">
+        <div class="stat-num">#1</div>
+        <div class="stat-lbl">revenue leak at urgent care clinics: missed billing codes from documentation gaps</div>
+        <div class="stat-src">Validated across 22 stakeholder interviews</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOLUTION ───────────────────────────────── -->
+<section id="solution">
+  <div class="si">
+    <div class="fi"><div class="s-eye">The Solution</div></div>
+    <div class="fi d1"><h2>One platform.<br>Five automated workflows.</h2></div>
+    <div class="fi d2"><p class="s-sub">QuickClinic runs as a plugin inside the EMR systems physicians already use. Nothing new to learn — just fewer things to do manually.</p></div>
+    <div class="feat-grid">
+      <div class="feat-card fi d1">
+        <span class="feat-ico">&#9889;</span>
+        <div class="feat-title">Auto-Triage</div>
+        <div class="feat-desc">Routes patients by acuity AND reimbursement potential simultaneously. The queue always reflects what's most valuable to see next.</div>
+      </div>
+      <div class="feat-card fi d2">
+        <span class="feat-ico">&#128203;</span>
+        <div class="feat-title">AI Documentation</div>
+        <div class="feat-desc">Generates a complete SOAP note draft from encounter data. Physicians review and approve in one click — not one hour.</div>
+      </div>
+      <div class="feat-card fi d3">
+        <span class="feat-ico">&#128176;</span>
+        <div class="feat-title">Revenue Flagging</div>
+        <div class="feat-desc">Surfaces every billing opportunity the documentation supports. No upcoding. No missed codes. Correct ICD-10 and CPT every time.</div>
+      </div>
+      <div class="feat-card fi d4">
+        <span class="feat-ico">&#128737;&#65039;</span>
+        <div class="feat-title">Audit Trail</div>
+        <div class="feat-desc">Immutable AI decision log before every EMR write. The compliance paper trail that makes hospital legal and IT teams say yes.</div>
+      </div>
+      <div class="feat-card fi d1">
+        <span class="feat-ico">&#128268;</span>
+        <div class="feat-title">EMR-Native</div>
+        <div class="feat-desc">Runs inside Epic and athenaOne via FHIR R4. No standalone app. No training overhead. Drop-in deployment in days.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ───────────────────────────── -->
+<section id="hiw">
+  <div class="si">
+    <div class="fi"><div class="s-eye">How It Works</div></div>
+    <div class="fi d1"><h2>From patient arrival<br>to filed claim — in minutes.</h2></div>
+    <div class="fi d2"><p class="s-sub">The entire pipeline runs automatically in the background. Physicians see drafts, not blank forms.</p></div>
+    <div class="fi d3">
+      <div class="steps-wrap">
+        <div class="steps-line"></div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">01</div>
+            <div class="step-title">Patient Arrives</div>
+            <div class="step-desc">AI begins scoring acuity and reimbursement potential the moment the patient is checked in.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">02</div>
+            <div class="step-title">Queue Updated</div>
+            <div class="step-desc">Priority rank reflects both clinical urgency and billing value. The physician always sees the right patient next.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">03</div>
+            <div class="step-title">Note Generated</div>
+            <div class="step-desc">AI drafts a complete SOAP note. Physician reviews the draft, edits if needed, approves with one click.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">04</div>
+            <div class="step-title">Claim Filed</div>
+            <div class="step-desc">Correct billing codes extracted and submitted automatically. Zero manual charge entry. Revenue captured.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MARKET ─────────────────────────────────── -->
+<section id="market">
+  <div class="si">
+    <div class="fi"><div class="s-eye">Market Opportunity</div></div>
+    <div class="fi d1"><h2>A <span class="grad">$2.08B</span> addressable market.</h2></div>
+    <div class="fi d2"><p class="s-sub">Every urgent care and emergency physician in the United States represents a potential seat. We are entering through California metros and expanding west.</p></div>
+    <div class="market-wrap fi d3">
+      <div class="market-bars">
+        <div class="mbar">
+          <div class="mbar-info">
+            <div class="mbar-tag">TAM</div>
+            <div class="mbar-val counter" data-to="2.08" data-prefix="$" data-suffix="B" data-dec="2">$2.08B</div>
+            <div class="mbar-sub">866,460 physicians &middot; USA</div>
+          </div>
+          <div class="mbar-track"><div class="mbar-fill" data-width="100" style="width:0%"></div></div>
+        </div>
+        <div class="mbar">
+          <div class="mbar-info">
+            <div class="mbar-tag">SAM</div>
+            <div class="mbar-val counter" data-to="560" data-prefix="$" data-suffix="M">$560M</div>
+            <div class="mbar-sub">~234K physicians &middot; Western USA</div>
+          </div>
+          <div class="mbar-track"><div class="mbar-fill" data-width="27" style="width:0%"></div></div>
+        </div>
+        <div class="mbar">
+          <div class="mbar-info">
+            <div class="mbar-tag">SOM</div>
+            <div class="mbar-val counter" data-to="187" data-prefix="$" data-suffix="M">$187M</div>
+            <div class="mbar-sub">~78K physicians &middot; CA Metros</div>
+          </div>
+          <div class="mbar-track"><div class="mbar-fill" data-width="9" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="market-path">
+        <div class="mpath-label fi" style="color:var(--muted);font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.25rem">Expansion Path</div>
+        <div class="mpath active fi d1">
+          <div class="mpath-dot"></div>
+          <div>
+            <div class="mpath-name">Phase 5 &mdash; CA Metros</div>
+            <div class="mpath-note">LA &amp; San Diego. One pilot clinic. Live now.</div>
+          </div>
+        </div>
+        <div class="mpath fi d2">
+          <div class="mpath-dot"></div>
+          <div>
+            <div class="mpath-name">Year 1 &mdash; Western USA</div>
+            <div class="mpath-note">Scale via MGMA networks and EMR partnerships</div>
+          </div>
+        </div>
+        <div class="mpath fi d3">
+          <div class="mpath-dot"></div>
+          <div>
+            <div class="mpath-name">Year 2&ndash;3 &mdash; National</div>
+            <div class="mpath-note">$4.8M revenue target by Year 3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY US ──────────────────────────────────── -->
+<section id="why">
+  <div class="si">
+    <div class="fi"><div class="s-eye">Why QuickClinic</div></div>
+    <div class="fi d1"><h2>The only AI that works<br>inside the workflow.</h2></div>
+    <div class="fi d2"><p class="s-sub">We interviewed 22 healthcare stakeholders. The same three blockers came up every time: adoption, liability, and revenue. We built for all three.</p></div>
+    <div class="why-grid">
+      <div class="why-card fi d1">
+        <div class="why-n">01</div>
+        <div class="why-title">Works Inside the Workflow</div>
+        <div class="why-desc">Embedded in Epic and athenaOne via FHIR. Physicians never leave their existing system. Adoption rate is everything in clinical tools &mdash; and we win by not asking them to change.</div>
+        <div class="why-vs">vs. standalone platforms that get abandoned after onboarding</div>
+      </div>
+      <div class="why-card fi d2">
+        <div class="why-n">02</div>
+        <div class="why-title">Revenue-First Queue</div>
+        <div class="why-desc">Our triage engine re-ranks the patient queue by reimbursement potential, not just clinical acuity. No competitor does this automatically. Clinics see up to 15% revenue improvement from routing alone.</div>
+        <div class="why-vs">vs. Qventus, Luma &mdash; scheduling tools, not revenue tools</div>
+      </div>
+      <div class="why-card fi d3">
+        <div class="why-n">03</div>
+        <div class="why-title">Audit-First AI</div>
+        <div class="why-desc">Every AI decision is logged to an immutable audit trail before it touches the EMR. No PHI sent to the model. The paper trail is what makes hospital legal and compliance say yes &mdash; and it's non-negotiable for us.</div>
+        <div class="why-vs">vs. AI tools that write directly without a compliance record</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TEAM ───────────────────────────────────── -->
+<section id="team">
+  <div class="si">
+    <div class="fi"><div class="s-eye">The Team</div></div>
+    <div class="fi d1"><h2>Built at UC Riverside<br>INNOVAR 2026.</h2></div>
+    <div class="fi d2"><p class="s-sub">Five months. 22 healthcare stakeholder interviews. A full AI pipeline in production.</p></div>
+    <div class="team-grid">
+      <div class="team-card fi d1">
+        <div class="avatar">CS</div>
+        <div class="team-name">Caleb Shin</div>
+        <div class="team-role">Co-Founder</div>
+        <div class="team-note">Full-stack &amp; AI systems. Built the API, AI engine, and EMR integration architecture.</div>
+      </div>
+      <div class="team-card fi d2">
+        <div class="avatar">BM</div>
+        <div class="team-name">Benjamin Min</div>
+        <div class="team-role">Co-Founder</div>
+        <div class="team-note">Product &amp; business strategy. Led market research and the 22-interview validation sprint.</div>
+      </div>
+      <div class="team-card fi d3">
+        <div class="avatar">AT</div>
+        <div class="team-name">Abhi Tamatam</div>
+        <div class="team-role">Co-Founder</div>
+        <div class="team-note">Design &amp; operations. Owns the clinic administrator experience and GTM execution.</div>
+      </div>
+    </div>
+    <div class="team-footer fi d4">
+      <div class="tf-item"><span class="n counter" data-to="22">22</span> Healthcare Interviews</div>
+      <div class="tf-item"><span class="n">5</span> Months to Full Pipeline</div>
+      <div class="tf-item"><span class="n">8</span> Production API Endpoints</div>
+      <div class="tf-item"><span class="n">100%</span> HIPAA-by-Design</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PILOT CTA ──────────────────────────────── -->
+<section id="pilot">
+  <div class="si">
+    <div class="connect-wrap">
+      <div class="fi"><div class="s-eye">Phase 5 Pilot</div></div>
+      <div class="fi d1"><h2>Interested in a pilot?</h2></div>
+      <div class="fi d2"><p class="connect-sub">We are looking for one urgent care clinic in California.</p></div>
+      <form class="pilot-form fi d3" id="pilot-form" action="https://formspree.io/f/mqeobvbj" method="POST">
+        <input class="pilot-input" id="pilot-email" type="email" name="email" placeholder="your@clinic.com" required>
+        <button class="pilot-btn" id="pilot-btn" type="submit">Request Access</button>
+      </form>
+      <div class="pilot-ok" id="pilot-ok">&#10003; &nbsp;Got it — we&rsquo;ll be in touch before end of week.</div>
+      <div class="connect-links fi d4">
+        <a href="mailto:shin.tsp2006@gmail.com" class="connect-link">&#8594; Email</a>
+        <a href="https://linkedin.com/in/chadleeshin" class="connect-link">&#8594; LinkedIn</a>
+        <a href="https://quick-clinic-landing.vercel.app" class="connect-link">&#8594; Summit Badge</a>
+      </div>
+      <div class="pilot-note fi d4">No commitment required. We handle HIPAA compliance, EMR integration, and onboarding from day one.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────── -->
+<footer>
+  <div class="footer-logo">Quick<span class="p">+</span>Clinic</div>
+  <div class="footer-sub">UC Riverside INNOVAR Program 2026 &mdash; AWS Summit Demo Build</div>
+  <div class="footer-links">
+    <a href="mailto:shin.tsp2006@gmail.com">Contact</a>
+    <a href="#pilot">Pilot Interest</a>
+    <a href="#why">Why Us</a>
+  </div>
+  <div class="footer-disc">This is a demo build for the AWS Summit 2026. QuickClinic is in private beta. All clinical workflows operate on de-identified data. No PHI is processed by AI inference. HIPAA-eligible infrastructure is scoped for production deployment on AWS.</div>
+</footer>
+
+<!-- ── QUINN ──────────────────────────────────── -->
+<button id="qbtn" aria-label="Chat with Quinn AI">
+  <div class="qpulse"></div>
+  Quinn
+</button>
+<div id="qdrawer" role="dialog" aria-label="Quinn AI Assistant">
+  <div class="qhdr">
+    <div class="qav">Q</div>
+    <div class="qhdr-info">
+      <h4>Quinn</h4>
+      <span>QuickClinic AI &mdash; always online</span>
+    </div>
+    <button class="qclose" id="qclose" aria-label="Close chat">&#10005;</button>
+  </div>
+  <div class="qmsgs" id="qmsgs"></div>
+  <div class="qinput-row">
+    <input class="qinput" id="qinput" type="text" placeholder="Ask Quinn anything…" autocomplete="off">
+    <button class="qsend" id="qsend">Send</button>
+  </div>
+</div>
+
+<!-- ── DEMO MODAL ────────────────────────────── -->
+<div id="demo-modal" role="dialog" aria-modal="true" aria-label="Product Demo">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3>QuickClinic &mdash; Live Product Demo</h3>
+      <button class="modal-close" id="demo-close-btn" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="modal-tabs" role="tablist">
+      <button class="modal-tab active" data-tab="physician" role="tab">Physician View</button>
+      <button class="modal-tab" data-tab="admin" role="tab">Admin View</button>
+      <button class="modal-tab" data-tab="quinn" role="tab">Quinn AI</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Tab 1: Physician View -->
+      <div class="modal-pane active" id="pane-physician">
+        <div class="phys-wrap">
+          <div>
+            <div class="pt-card">
+              <div class="pt-name">Patient #7 &mdash; J.M.</div>
+              <div class="pt-meta">Male, 52 &middot; Arrived 09:14 AM</div>
+              <span class="badge esi2">ESI 2</span>
+              <span class="badge high-rev">High Revenue</span>
+              <div class="vital-row">
+                <div class="vital"><div class="vital-v">148/92</div><div class="vital-l">BP</div></div>
+                <div class="vital"><div class="vital-v">104</div><div class="vital-l">HR</div></div>
+                <div class="vital"><div class="vital-v">97%</div><div class="vital-l">SpO2</div></div>
+                <div class="vital"><div class="vital-v">37.1°</div><div class="vital-l">Temp</div></div>
+              </div>
+            </div>
+            <div style="margin-top:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1rem">
+              <div style="font-size:.72rem;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem">Triage Score</div>
+              <div style="font-family:var(--font-h);font-size:2rem;font-weight:800;color:var(--blue);line-height:1">ESI 2</div>
+              <div style="color:var(--muted);font-size:.78rem;margin-top:.25rem">Acuity: High &middot; Reimbursement: High</div>
+              <div style="margin-top:.75rem;background:var(--bg2);border-radius:6px;padding:.5rem .75rem;font-size:.78rem;color:var(--muted)">Chest pain with diaphoresis, elevated BP. Rule out ACS. Reimbursement tier: <span style="color:var(--blue);font-weight:600">high</span>.</div>
+            </div>
+          </div>
+          <div class="soap-card">
+            <div class="soap-hdr">
+              <h4>AI SOAP Note Draft</h4>
+              <span class="ai-tag">AI Generated &middot; Pending Approval</span>
+            </div>
+            <div class="soap-section">
+              <div class="soap-label">Subjective</div>
+              <div class="soap-text">52-year-old male presenting with acute onset chest pain, 7/10 severity, substernal with radiation to left arm. Associated diaphoresis and mild dyspnea. Onset approximately 45 minutes prior to arrival. Denies nausea or syncope. PMH: HTN, hyperlipidemia. Medications: lisinopril, atorvastatin.</div>
+            </div>
+            <div class="soap-section">
+              <div class="soap-label">Objective</div>
+              <div class="soap-text">BP 148/92, HR 104, RR 18, SpO2 97% RA, Temp 37.1°C. Diaphoretic. Cardiac: tachycardic, regular rhythm, no murmurs. Lungs: clear bilaterally. 12-lead ECG obtained — ST changes in V2-V4.</div>
+            </div>
+            <div class="soap-section">
+              <div class="soap-label">Assessment</div>
+              <div class="soap-text">Acute coronary syndrome, rule out STEMI/NSTEMI. High-risk features present. Immediate cardiology consultation warranted.</div>
+            </div>
+            <div class="soap-section">
+              <div class="soap-label">Plan</div>
+              <div class="soap-text">Aspirin 325mg PO, nitroglycerin SL PRN, IV access x2, troponin series, repeat ECG in 30 min, cardiology consult, admit to telemetry.</div>
+            </div>
+            <div class="soap-label">Billing Codes</div>
+            <div class="code-row">
+              <span class="code-chip">ICD-10: I20.0</span>
+              <span class="code-chip">ICD-10: I10</span>
+              <span class="code-chip">CPT: 99285</span>
+              <span class="code-chip">CPT: 93000</span>
+            </div>
+            <button class="approve-btn" id="approve-btn">&#10003;&nbsp; Approve &amp; File to EMR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Admin View -->
+      <div class="modal-pane" id="pane-admin">
+        <div class="admin-metrics">
+          <div class="metric-card">
+            <div class="metric-v">47</div>
+            <div class="metric-l">Patients Today</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-v">$18,420</div>
+            <div class="metric-l">Revenue Captured</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-v" style="color:#ffb347">8</div>
+            <div class="metric-l">Pending Notes</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-v">24 min</div>
+            <div class="metric-l">Avg. Wait Time</div>
+          </div>
+        </div>
+        <div class="admin-bottom">
+          <div class="queue-table">
+            <div class="qt-hdr">Priority Queue</div>
+            <div class="qt-row">
+              <span class="badge esi2">ESI 2</span>
+              <span class="qt-name">Patient #7 &mdash; Chest Pain</span>
+              <span class="qt-rev badge high-rev">High Rev</span>
+            </div>
+            <div class="qt-row">
+              <span class="badge" style="background:rgba(255,70,90,.15);border:1px solid rgba(255,70,90,.3);color:#ff6b6b">ESI 1</span>
+              <span class="qt-name">Patient #3 &mdash; Dyspnea</span>
+              <span class="qt-rev badge high-rev">High Rev</span>
+            </div>
+            <div class="qt-row">
+              <span class="badge" style="background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);color:#ffd93d">ESI 3</span>
+              <span class="qt-name">Patient #12 &mdash; Laceration</span>
+              <span class="qt-rev" style="color:var(--muted);font-size:.75rem">Med Rev</span>
+            </div>
+            <div class="qt-row">
+              <span class="badge" style="background:rgba(0,200,120,.1);border:1px solid rgba(0,200,120,.3);color:#00c97a">ESI 4</span>
+              <span class="qt-name">Patient #18 &mdash; URI</span>
+              <span class="qt-rev" style="color:var(--dim);font-size:.75rem">Low Rev</span>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-hdr">Revenue This Week ($K)</div>
+            <div class="bar-chart" id="admin-chart">
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:62%"></div><div class="bc-day">Mon</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:78%"></div><div class="bc-day">Tue</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:55%"></div><div class="bc-day">Wed</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:88%"></div><div class="bc-day">Thu</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:72%"></div><div class="bc-day">Fri</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:45%"></div><div class="bc-day">Sat</div></div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="height:80%;background:linear-gradient(180deg,#00ccff,var(--blue))"></div><div class="bc-day" style="color:var(--blue)">Today</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Quinn AI -->
+      <div class="modal-pane" id="pane-quinn">
+        <div class="quinn-preview">
+          <div class="qp-msg bot">Hi! I'm Quinn, QuickClinic's AI assistant. Ask me anything about HIPAA compliance, how the pipeline works, or our pilot program.</div>
+          <div class="qp-msg usr">Is QuickClinic HIPAA compliant?</div>
+          <div class="qp-msg bot">Yes. Every AI decision is logged to an immutable audit trail before touching the EMR. No PHI is sent to the model — only a de-identified patient ID hash. Built on HIPAA-eligible AWS infrastructure (ECS Fargate, RDS with BAA, encrypted S3) from day one.</div>
+          <div class="qp-msg usr">How quickly can we see results?</div>
+          <div class="qp-msg bot">Most clinics see measurable documentation time reduction within week one. Revenue improvements from better billing code capture typically show up in the first billing cycle — usually 2–3 weeks post-integration. Our pilot includes full onboarding support from day one.</div>
+          <div class="qp-msg usr">How do I apply for the pilot?</div>
+          <div class="qp-msg bot">Use the "Request Pilot Access" form on this page, or email the team directly at shin.tsp2006@gmail.com. We're selecting one California urgent care clinic for a fully supported Phase 5 pilot — I'd love to connect you with the team today.</div>
+        </div>
+        <div class="qp-note">This is a preview of Quinn's FAQ capability. The live chatbot is embedded in the bottom-right corner of this page.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* Pause SVG SMIL animations immediately — before gate closes */
+document.querySelectorAll('#flow-viz svg').forEach(svg => {
+  try { svg.pauseAnimations(); } catch(e) {}
+});
+
+/* ── GATE ──────────────────────────────────────── */
+(function(){
+  const gate = document.getElementById('gate');
+  const input = document.getElementById('gate-input');
+  const btn = document.getElementById('gate-btn');
+  const err = document.getElementById('gate-err');
+  const CODE = 'QC26';
+
+  function tryUnlock(){
+    if(input.value.trim().toUpperCase() === CODE){
+      gate.classList.add('hide');
+      setTimeout(()=>{
+        gate.style.display = 'none';
+        document.body.classList.add('site-ready');
+        document.querySelectorAll('#flow-viz svg').forEach(svg => {
+          try { svg.unpauseAnimations(); } catch(e) {}
+        });
+        /* Reveal all fade-in elements instantly — no staggered animation on load */
+        document.querySelectorAll('.fi').forEach(el => {
+          el.style.transition = 'none';
+          el.classList.add('v');
+        });
+        initPage();
+        const hero = document.getElementById('hero');
+        console.log('[hero fit] scrollHeight:', hero.scrollHeight, 'clientHeight:', hero.clientHeight, 'window.innerHeight:', window.innerHeight, 'overflow:', hero.scrollHeight > hero.clientHeight ? 'YES - OVERFLOW' : 'fits');
+      }, 300);
+    } else {
+      err.textContent = 'Incorrect access code.';
+      input.value = '';
+      gate.classList.remove('shake');
+      void gate.offsetWidth;
+      gate.classList.add('shake');
+      setTimeout(()=>gate.classList.remove('shake'), 400);
+    }
+  }
+  btn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', e => { if(e.key==='Enter') tryUnlock(); });
+  input.focus();
+})();
+
+/* ── MAIN INIT ─────────────────────────────────── */
+function initPage(){
+  initNav();
+  initQuinn();
+  initPilotForm();
+  initDemoModal();
+  initInteractiveDemo();
+  initScrollAnimations();
+}
+
+/* ── NAV ────────────────────────────────────────── */
+function initNav(){
+  const nav = document.getElementById('nav');
+  function onScroll(){ nav.classList.toggle('scrolled', window.scrollY > 40); }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+}
+
+/* ── SCROLL ANIMATIONS ─────────────────────────── */
+function initScrollAnimations(){
+  const fadeObs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('v'); fadeObs.unobserve(e.target); } });
+  },{ threshold:0.12 });
+  document.querySelectorAll('.fi').forEach(el=>fadeObs.observe(el));
+
+  const counterObs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.querySelectorAll('.counter').forEach(animateCounter);
+        e.target.querySelectorAll('.mbar-fill[data-width]').forEach(bar=>{
+          const w = bar.dataset.width;
+          setTimeout(()=>{ bar.style.width = w + '%'; }, 200);
+        });
+        counterObs.unobserve(e.target);
+      }
+    });
+  },{ threshold:0.2 });
+  document.querySelectorAll('#problem,#market,#team').forEach(s=>counterObs.observe(s));
+}
+
+function animateCounter(el){
+  const to = parseFloat(el.dataset.to);
+  const prefix = el.dataset.prefix || '';
+  const suffix = el.dataset.suffix || '';
+  const dec = parseInt(el.dataset.dec || '0');
+  const duration = 2000;
+  const start = Date.now();
+  function step(){
+    const p = Math.min((Date.now()-start)/duration, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = eased * to;
+    el.textContent = prefix + (dec > 0 ? val.toFixed(dec) : Math.floor(val)) + suffix;
+    if(p < 1) requestAnimationFrame(step);
+    else el.textContent = prefix + (dec > 0 ? to.toFixed(dec) : to) + suffix;
+  }
+  requestAnimationFrame(step);
+}
+
+/* ── DEMO MODAL ─────────────────────────────────── */
+function initDemoModal(){
+  const modal = document.getElementById('demo-modal');
+  const openBtn = document.getElementById('demo-open-btn');
+  const closeBtn = document.getElementById('demo-close-btn');
+  const tabs = modal.querySelectorAll('.modal-tab');
+  const panes = modal.querySelectorAll('.modal-pane');
+  const approveBtn = document.getElementById('approve-btn');
+
+  function openModal(){
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
+
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      const target = tab.dataset.tab;
+      tabs.forEach(t=>t.classList.remove('active'));
+      panes.forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('pane-' + target).classList.add('active');
+    });
+  });
+
+  if(approveBtn){
+    approveBtn.addEventListener('click', ()=>{
+      if(approveBtn.classList.contains('done')) return;
+      approveBtn.textContent = 'Filing to EMR…';
+      approveBtn.disabled = true;
+      setTimeout(()=>{
+        approveBtn.classList.add('done');
+        approveBtn.textContent = '✓ Filed to EMR — Audit Log Written';
+      }, 1200);
+    });
+  }
+}
+
+/* ── QUINN ──────────────────────────────────────── */
+function initQuinn(){
+  const btn = document.getElementById('qbtn');
+  const drawer = document.getElementById('qdrawer');
+  const msgs = document.getElementById('qmsgs');
+  const input = document.getElementById('qinput');
+  const send = document.getElementById('qsend');
+  const closeBtn = document.getElementById('qclose');
+  let open = false;
+  let userEmail = null;
+  let awaitingEmail = false;
+  const history = [];
+
+  const SYSTEM = "You are Quinn, the AI assistant for QuickClinic — an AI-powered workflow automation platform for urgent care and emergency clinics. You help clinic administrators, physicians, and investors understand the product. You know everything about QuickClinic: it automates triage scoring (ESI 1-5), generates SOAP notes, flags billing opportunities (ICD-10/CPT codes), integrates with Epic and athenaOne via FHIR R4, is HIPAA compliant with immutable audit trails, costs a monthly per-physician-seat subscription, was built by Caleb Shin, Benjamin Min, and Abhi Tamatam at UC Riverside INNOVAR 2026, and is currently seeking one pilot clinic in California. Answer any question helpfully and concisely. If asked something you genuinely cannot answer, tell the user you will have the team follow up by email and ask for their email address.";
+
+  function addMsg(text, role){
+    const m = document.createElement('div');
+    m.className = 'qm ' + role;
+    m.textContent = text;
+    msgs.appendChild(m);
+    msgs.scrollTop = msgs.scrollHeight;
+    return m;
+  }
+
+  function addTyping(){
+    const t = document.createElement('div');
+    t.className = 'qtyping';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(t);
+    msgs.scrollTop = msgs.scrollHeight;
+    return t;
+  }
+
+  setTimeout(()=>{
+    addMsg("Hi! I'm Quinn, QuickClinic's AI assistant. Ask me anything about the platform — how it works, pricing, HIPAA compliance, or the pilot program.", 'bot');
+  }, 400);
+
+  function toggle(v){
+    open = (v !== undefined) ? v : !open;
+    drawer.classList.toggle('open', open);
+    if(open) input.focus();
+  }
+
+  function isEmail(s){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+  }
+
+  async function handleSend(){
+    const v = input.value.trim();
+    if(!v) return;
+    addMsg(v, 'usr');
+    input.value = '';
+    send.disabled = true;
+    input.disabled = true;
+
+    // Email capture flow
+    if(awaitingEmail && isEmail(v)){
+      userEmail = v.trim();
+      awaitingEmail = false;
+      history.push({ role:'user', content: v });
+      const typing = addTyping();
+      try {
+        await fetch('https://formspree.io/f/mqeobvbj', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Accept':'application/json'},
+          body: JSON.stringify({ email: userEmail, source:'quinn-escalation' })
+        });
+      } catch(e){}
+      typing.remove();
+      const reply = 'Got it. The QuickClinic team will follow up within 24 hours.';
+      addMsg(reply, 'bot');
+      history.push({ role:'assistant', content: reply });
+      send.disabled = false;
+      input.disabled = false;
+      input.focus();
+      return;
+    }
+
+    // Claude API call
+    history.push({ role:'user', content: v });
+    const typing = addTyping();
+    try {
+      const res = await fetch('/api/quinn', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ system: SYSTEM, messages: history })
+      });
+      const data = await res.json();
+      typing.remove();
+      let reply;
+      if(res.ok && data.content && data.content[0]){
+        reply = data.content[0].text;
+        history.push({ role:’assistant’, content: reply });
+        if(!userEmail && /(email address|your email|please.*email|share.*email)/i.test(reply)){
+          awaitingEmail = true;
+        }
+      } else {
+        console.error(‘[quinn] proxy response’, res.status, JSON.stringify(data));
+        reply = "I’m having a little trouble connecting right now — reach out directly at shin.tsp2006@gmail.com or use the contact form below.";
+      }
+      addMsg(reply, ‘bot’);
+    } catch(err){
+      typing.remove();
+      console.error(‘[quinn] fetch error:’, err);
+      addMsg("I’m having a little trouble connecting right now — reach out directly at shin.tsp2006@gmail.com or use the contact form below.", ‘bot’);
+    }
+    send.disabled = false;
+    input.disabled = false;
+    input.focus();
+  }
+
+  btn.addEventListener('click', ()=>toggle());
+  closeBtn.addEventListener('click', ()=>toggle(false));
+  send.addEventListener('click', handleSend);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') handleSend(); });
+}
+
+/* ── PILOT FORM ─────────────────────────────────── */
+function initPilotForm(){
+  const form = document.getElementById('pilot-form');
+  const emailInput = document.getElementById('pilot-email');
+  const btnEl = document.getElementById('pilot-btn');
+  const ok = document.getElementById('pilot-ok');
+
+  form.addEventListener('submit', async(e)=>{
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    if(!email) return;
+    btnEl.textContent = 'Sending…';
+    btnEl.disabled = true;
+    try {
+      const res = await fetch(form.action, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+        body: JSON.stringify({ email, source:'aws-summit-demo' })
+      });
+      if(res.ok){
+        ok.classList.add('show');
+        emailInput.value = '';
+        btnEl.textContent = 'Sent ✓';
+      } else {
+        btnEl.textContent = 'Try Again';
+        btnEl.disabled = false;
+      }
+    } catch {
+      btnEl.textContent = 'Try Again';
+      btnEl.disabled = false;
+    }
+  });
+}
+
+/* ── INTERACTIVE DEMO ─────────────────────────── */
+var _demoTimers=[];
+var _demoGen=0;
+function _ddt(fn,ms){var id=setTimeout(fn,ms);_demoTimers.push(id);}
+function _stopDemo(){_demoTimers.forEach(clearTimeout);_demoTimers=[];_demoGen++;}
+
+function initInteractiveDemo(){
+  var tabBtns=document.querySelectorAll('.demo-tab-btn');
+  if(!tabBtns.length) return;
+  tabBtns.forEach(function(btn){
+    btn.addEventListener('click',function(){
+      tabBtns.forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      document.querySelectorAll('.demo-pane').forEach(function(p){p.classList.remove('active');});
+      var pane=document.getElementById('dp-'+btn.dataset.demo);
+      if(pane) pane.classList.add('active');
+      _stopDemo();
+      if(btn.dataset.demo==='phys') _physLoop();
+      else _adminLoop();
+    });
+  });
+  _physLoop();
+}
+
+function _resetPhys(){
+  var g=document.getElementById('dg-btn'),s=document.getElementById('dg-soap'),
+      a=document.getElementById('da-btn'),f=document.getElementById('df-msg'),
+      c=document.getElementById('demo-cur');
+  if(g) g.classList.remove('pulse');
+  if(s) s.classList.remove('show');
+  if(a) a.classList.remove('pulse');
+  if(f) f.classList.remove('show');
+  if(c){c.classList.remove('show','press');c.style.left='50%';c.style.top='50%';}
+}
+
+function _physLoop(){
+  var pane=document.getElementById('dp-phys');
+  if(!pane||!pane.classList.contains('active')) return;
+  _resetPhys();
+  var genBtn=document.getElementById('dg-btn'),soap=document.getElementById('dg-soap'),
+      appBtn=document.getElementById('da-btn'),filed=document.getElementById('df-msg'),
+      cur=document.getElementById('demo-cur');
+  if(!cur||!genBtn) return;
+
+  function pos(el){
+    var pr=pane.getBoundingClientRect(),er=el.getBoundingClientRect();
+    cur.style.left=(er.left-pr.left+er.width*.3)+'px';
+    cur.style.top=(er.top-pr.top+er.height*.3)+'px';
+  }
+
+  _ddt(function(){cur.classList.add('show');pos(genBtn);},700);
+  _ddt(function(){cur.classList.add('press');genBtn.classList.add('pulse');},1750);
+  _ddt(function(){cur.classList.remove('press');soap.classList.add('show');},2100);
+  _ddt(function(){pos(appBtn);},4200);
+  _ddt(function(){cur.classList.add('press');appBtn.classList.add('pulse');},5150);
+  _ddt(function(){cur.classList.remove('press');filed.classList.add('show');},5480);
+  _ddt(function(){_physLoop();},9200);
+}
+
+function _resetAdmin(){
+  var pairs=[['dm-pts','0'],['dm-rev','$0'],['dm-notes','0'],['dm-wait','0m']];
+  pairs.forEach(function(p){var el=document.getElementById(p[0]);if(el) el.textContent=p[1];});
+  [0,1,2,3].forEach(function(i){var el=document.getElementById('dq-'+i);if(el) el.classList.remove('show');});
+  document.querySelectorAll('.da-bar').forEach(function(bar){
+    bar.style.transition='none';bar.style.height='0';bar.offsetHeight;bar.style.transition='';
+  });
+}
+
+function _adminLoop(){
+  var pane=document.getElementById('dp-admin');
+  if(!pane||!pane.classList.contains('active')) return;
+  _resetAdmin();
+  var gen=_demoGen;
+  _ddt(function(){if(_demoGen!==gen)return;_demoCountUp('dm-pts',0,47,1200,'','');},300);
+  _ddt(function(){if(_demoGen!==gen)return;_demoCountUp('dm-rev',0,18420,1400,'$','');},300);
+  _ddt(function(){if(_demoGen!==gen)return;_demoCountUp('dm-notes',0,8,900,'','');},300);
+  _ddt(function(){if(_demoGen!==gen)return;_demoCountUp('dm-wait',0,24,950,'','m');},300);
+  [0,1,2,3].forEach(function(i){
+    _ddt(function(){if(_demoGen!==gen)return;var el=document.getElementById('dq-'+i);if(el) el.classList.add('show');},900+i*260);
+  });
+  _ddt(function(){
+    if(_demoGen!==gen) return;
+    document.querySelectorAll('.da-bar').forEach(function(bar,i){
+      setTimeout(function(){bar.style.height=(parseInt(bar.dataset.pct)*65/100)+'px';},i*85);
+    });
+  },1600);
+  _ddt(function(){_adminLoop();},8800);
+}
+
+function _demoCountUp(id,from,to,dur,pre,suf){
+  var el=document.getElementById(id);
+  if(!el) return;
+  var s=performance.now(),gen=_demoGen;
+  (function step(now){
+    if(_demoGen!==gen) return;
+    var p=Math.min((now-s)/dur,1),v=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));
+    el.textContent=pre+(v>=1000?v.toLocaleString():v)+suf;
+    if(p<1) requestAnimationFrame(step);
+  })(performance.now());
+}
+</script>
+</body>
+</html>
