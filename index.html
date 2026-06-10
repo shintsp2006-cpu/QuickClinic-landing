@@ -23,7 +23,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(0,180,255,.055) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;z-index:0}
 
 /* ── GATE ────────────────────────────────────── */
-#gate{position:fixed;inset:0;z-index:9999;background:#020710;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;transition:opacity .5s ease}
+#gate{position:fixed;inset:0;z-index:9999;background:#020710;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;transition:opacity .25s ease}
 #gate.hide{opacity:0;pointer-events:none}
 .gate-logo{display:flex;align-items:center;gap:.45rem;font-family:var(--font-h);font-size:2.2rem;font-weight:800;color:var(--text)}
 .gate-plus{color:var(--blue);font-size:2.6rem;line-height:1;filter:drop-shadow(0 0 8px var(--blue))}
@@ -51,7 +51,7 @@ nav.scrolled{background:rgba(5,11,26,.88);backdrop-filter:blur(14px);border-colo
 @media(max-width:860px){.nav-links{display:none}.nav-cta{display:none}}
 
 /* ── HERO ────────────────────────────────────── */
-#hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:7rem 2.5rem 4rem;overflow:hidden}
+#hero{position:relative;min-height:auto;display:flex;align-items:center;padding:7rem 2.5rem 4rem;overflow:hidden}
 #hero::after{content:'';position:absolute;top:50%;left:55%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(0,100,255,.07) 0%,transparent 70%);pointer-events:none}
 .hero-content{position:relative;z-index:2;max-width:590px}
 .eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:var(--glow2);border:1px solid var(--border);border-radius:100px;color:var(--blue);font-size:.72rem;font-weight:600;letter-spacing:.1em;padding:.3rem .9rem;margin-bottom:1.5rem;text-transform:uppercase}
@@ -68,7 +68,7 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .trust-bar{display:flex;flex-wrap:wrap;gap:1.25rem}
 .trust-item{color:var(--dim);font-size:.78rem;display:flex;align-items:center;gap:.4rem}
 .trust-item::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;box-shadow:0 0 5px var(--blue);flex-shrink:0}
-@media(max-width:860px){#hero{box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:75px 1.5rem 1.5rem;height:auto;min-height:0}#hero::after{display:none}}
+@media(max-width:860px){#hero{box-sizing:border-box;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:66px 1.5rem 1rem;height:auto;min-height:0}#hero::after{display:none}}
 
 /* ── FLOW VIZ ────────────────────────────────── */
 #flow-viz{position:absolute;top:0;right:0;width:58%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
@@ -1030,17 +1030,19 @@ document.querySelectorAll('#flow-viz svg').forEach(svg => {
       gate.classList.add('hide');
       setTimeout(()=>{
         gate.style.display = 'none';
-        /* 800ms after gate is fully gone, start animations and page init */
-        setTimeout(() => {
-          document.body.classList.add('site-ready');
-          document.querySelectorAll('#flow-viz svg').forEach(svg => {
-            try { svg.unpauseAnimations(); } catch(e) {}
-          });
-          initPage();
-          const hero = document.getElementById('hero');
-          console.log('[hero fit] scrollHeight:', hero.scrollHeight, 'clientHeight:', hero.clientHeight, 'window.innerHeight:', window.innerHeight, 'overflow:', hero.scrollHeight > hero.clientHeight ? 'YES - OVERFLOW' : 'fits');
-        }, 800);
-      }, 500);
+        document.body.classList.add('site-ready');
+        document.querySelectorAll('#flow-viz svg').forEach(svg => {
+          try { svg.unpauseAnimations(); } catch(e) {}
+        });
+        /* Reveal all fade-in elements instantly — no staggered animation on load */
+        document.querySelectorAll('.fi').forEach(el => {
+          el.style.transition = 'none';
+          el.classList.add('v');
+        });
+        initPage();
+        const hero = document.getElementById('hero');
+        console.log('[hero fit] scrollHeight:', hero.scrollHeight, 'clientHeight:', hero.clientHeight, 'window.innerHeight:', window.innerHeight, 'overflow:', hero.scrollHeight > hero.clientHeight ? 'YES - OVERFLOW' : 'fits');
+      }, 300);
     } else {
       err.textContent = 'Incorrect access code.';
       input.value = '';
@@ -1061,8 +1063,7 @@ function initPage(){
   initQuinn();
   initPilotForm();
   initDemoModal();
-  /* Delay scroll animations so .fi elements don't jump during gate fade */
-  setTimeout(initScrollAnimations, 300);
+  initScrollAnimations();
 }
 
 /* ── NAV ────────────────────────────────────────── */
