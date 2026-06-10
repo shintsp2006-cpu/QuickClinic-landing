@@ -450,8 +450,8 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
   <div class="gate-eyebrow">AWS Summit Demo &middot; Phase 5 Pilot</div>
   <div class="gate-form">
     <div class="gate-label">Access Code</div>
-    <input id="gate-input" class="gate-input" type="password" maxlength="6" placeholder="····" autocomplete="off" spellcheck="false">
-    <button class="gate-btn" id="gate-btn">Enter</button>
+    <input id="gate-input" class="gate-input" type="password" maxlength="6" placeholder="····" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')tryGateUnlock()">
+    <button class="gate-btn" id="gate-btn" onclick="tryGateUnlock()">Enter</button>
     <div class="gate-err" id="gate-err"></div>
   </div>
 </div>
@@ -1183,43 +1183,40 @@ document.querySelectorAll('#flow-viz svg').forEach(svg => {
 });
 
 /* ── GATE ──────────────────────────────────────── */
-(function(){
-  const gate = document.getElementById('gate');
-  const input = document.getElementById('gate-input');
-  const btn = document.getElementById('gate-btn');
-  const err = document.getElementById('gate-err');
-  const CODE = 'QC26';
-
-  function tryUnlock(){
-    if(input.value.trim().toUpperCase() === CODE){
-      gate.classList.add('hide');
-      setTimeout(()=>{
-        gate.style.display = 'none';
-        document.body.classList.add('site-ready');
-        document.querySelectorAll('#flow-viz svg').forEach(svg => {
-          try { svg.unpauseAnimations(); } catch(e) {}
-        });
-        /* Reveal all fade-in elements instantly — no staggered animation on load */
-        document.querySelectorAll('.fi').forEach(el => {
-          el.style.transition = 'none';
-          el.classList.add('v');
-        });
-        initPage();
-        const hero = document.getElementById('hero');
-        console.log('[hero fit] scrollHeight:', hero.scrollHeight, 'clientHeight:', hero.clientHeight, 'window.innerHeight:', window.innerHeight, 'overflow:', hero.scrollHeight > hero.clientHeight ? 'YES - OVERFLOW' : 'fits');
-      }, 300);
-    } else {
-      err.textContent = 'Incorrect access code.';
-      input.value = '';
-      gate.classList.remove('shake');
-      void gate.offsetWidth;
-      gate.classList.add('shake');
-      setTimeout(()=>gate.classList.remove('shake'), 400);
-    }
+function tryGateUnlock(){
+  var gate  = document.getElementById('gate');
+  var input = document.getElementById('gate-input');
+  var err   = document.getElementById('gate-err');
+  if(!gate || !input) return;
+  if(input.value.trim().toUpperCase() === 'QC26'){
+    gate.classList.add('hide');
+    setTimeout(function(){
+      gate.style.display = 'none';
+      document.body.classList.add('site-ready');
+      document.querySelectorAll('#flow-viz svg').forEach(function(svg){
+        try { svg.unpauseAnimations(); } catch(e) {}
+      });
+      document.querySelectorAll('.fi').forEach(function(el){
+        el.style.transition = 'none';
+        el.classList.add('v');
+      });
+      initPage();
+    }, 300);
+  } else {
+    err.textContent = 'Incorrect access code.';
+    input.value = '';
+    gate.classList.remove('shake');
+    void gate.offsetWidth;
+    gate.classList.add('shake');
+    setTimeout(function(){ gate.classList.remove('shake'); }, 400);
   }
-  btn.addEventListener('click', tryUnlock);
-  input.addEventListener('keydown', e => { if(e.key==='Enter') tryUnlock(); });
-  input.focus();
+}
+(function(){
+  var btn   = document.getElementById('gate-btn');
+  var input = document.getElementById('gate-input');
+  if(btn)   btn.addEventListener('click', tryGateUnlock);
+  if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter') tryGateUnlock(); });
+  if(input) input.focus();
 })();
 
 /* ── MAIN INIT ─────────────────────────────────── */
