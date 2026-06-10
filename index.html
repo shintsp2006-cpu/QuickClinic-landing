@@ -6,7 +6,8 @@
 <title>QuickClinic — Clinical AI for Urgent Care</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;overflow-x:hidden}
@@ -67,7 +68,7 @@ h1{font-family:var(--font-h);font-size:clamp(2.3rem,4.5vw,3.7rem);font-weight:80
 .trust-bar{display:flex;flex-wrap:wrap;gap:1.25rem}
 .trust-item{color:var(--dim);font-size:.78rem;display:flex;align-items:center;gap:.4rem}
 .trust-item::before{content:'';width:5px;height:5px;background:var(--blue);border-radius:50%;box-shadow:0 0 5px var(--blue);flex-shrink:0}
-@media(max-width:860px){#hero{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:70px 1.5rem 1.5rem;min-height:calc(100vh - 58px);height:calc(100vh - 58px);overflow:hidden}#hero::after{display:none}}
+@media(max-width:860px){#hero{box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:65px 1.5rem 1rem;min-height:calc(100vh - 58px);height:calc(100vh - 58px);overflow:hidden}#hero::after{display:none}}
 
 /* ── FLOW VIZ ────────────────────────────────── */
 #flow-viz{position:absolute;top:0;right:0;width:58%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
@@ -313,9 +314,9 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
   section{padding:3rem 1.25rem}
 
   /* Typography */
-  h1{font-size:20px;line-height:1.2;margin-bottom:1rem}
+  h1{font-size:18px;line-height:1.2;margin-bottom:.75rem;overflow:hidden;max-height:2.4em}
   h2{font-size:20px;line-height:1.25}
-  .hero-sub{font-size:.85rem;margin-bottom:1rem;overflow:hidden;max-height:4.5rem}
+  .hero-sub{display:none}
   .feat-desc,.step-desc,.why-desc,.mpath-note,.tf-item{font-size:.875rem}
   .s-eye,.eyebrow,.stat-src,.flow-live-lbl,.fstat,.vital-l,.soap-label,.bc-day,.code-chip,.ai-tag,.qp-note,.footer-disc,.badge{font-size:.75rem}
 
@@ -325,7 +326,7 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
   #flow-viz{display:none}
   .trust-bar{display:none}
   .btn-p,.btn-g{padding:10px 1.25rem}
-  .cta-row{gap:8px;margin-bottom:0}
+  .cta-row{gap:8px;margin-bottom:0;margin-top:1rem}
 
   /* Grids → single column */
   .feat-grid{grid-template-columns:1fr}
@@ -356,7 +357,6 @@ footer{background:#020810;border-top:1px solid var(--border);padding:2.5rem 2rem
 
 /* ── MOBILE UX PASS (≤480px) ─────────────────── */
 @media(max-width:480px){
-  h1{font-size:24px}
   h2{font-size:18px}
   .feat-grid{grid-template-columns:1fr}
   .cta-row{flex-direction:column}
@@ -1037,6 +1037,8 @@ document.querySelectorAll('#flow-viz svg').forEach(svg => {
             try { svg.unpauseAnimations(); } catch(e) {}
           });
           initPage();
+          const hero = document.getElementById('hero');
+          console.log('[hero fit] scrollHeight:', hero.scrollHeight, 'clientHeight:', hero.clientHeight, 'window.innerHeight:', window.innerHeight, 'overflow:', hero.scrollHeight > hero.clientHeight ? 'YES - OVERFLOW' : 'fits');
         }, 800);
       }, 500);
     } else {
